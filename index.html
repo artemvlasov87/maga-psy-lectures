@@ -1,0 +1,2114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>База данных лекций — Магистратура, Мининский университет</title>
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+
+  :root{
+    --paper:#15191a;
+    --paper-raised:#1d2325;
+    --paper-sunken:#0f1213;
+    --ink:#e9edec;
+    --ink-soft:#a2b0ac;
+    --ink-faint:#69756f;
+    --accent:#4fac9a;
+    --accent-strong:#82d1c1;
+    --accent-soft:#1c2f2b;
+    --line:#2b3432;
+    --live-bg:#241c10;
+    --live-border:#b8853c;
+    --live-ink:#e9cd94;
+    --stub-bg:#1b201f;
+    --stub-border:#48524d;
+    --shadow: 0 1px 2px rgba(0,0,0,.5), 0 10px 30px rgba(0,0,0,.4);
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --sans: "IBM Plex Sans", -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:16px;
+    line-height:1.6;
+  }
+  a{color:var(--accent-strong);}
+
+  .app{
+    display:grid;
+    grid-template-columns: 296px 1fr;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    background:var(--paper-raised);
+    border-right:1px solid var(--line);
+    padding:22px 18px 32px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+  }
+  .brand{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    margin-bottom:18px;
+    padding:0 4px;
+  }
+  .brand .kicker{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.11em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  .brand .title{
+    font-family:var(--serif);
+    font-size:21px;
+    font-weight:600;
+    text-wrap:balance;
+    line-height:1.25;
+  }
+  .brand .sub{
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+
+  .search-wrap{
+    position:relative;
+    margin:16px 2px 10px;
+  }
+  .search-wrap input{
+    width:100%;
+    padding:9px 12px 9px 32px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:var(--paper-sunken);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:13.5px;
+  }
+  .search-wrap input:focus{
+    outline:2px solid var(--accent);
+    outline-offset:1px;
+  }
+  .search-wrap svg{
+    position:absolute;
+    left:10px;
+    top:50%;
+    transform:translateY(-50%);
+    width:14px;
+    height:14px;
+    color:var(--ink-faint);
+  }
+  #search-results{
+    margin:0 2px 14px;
+    display:none;
+    flex-direction:column;
+    gap:2px;
+    max-height:260px;
+    overflow-y:auto;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:var(--paper-sunken);
+    padding:6px;
+  }
+  #search-results.show{display:flex;}
+  #search-results button{
+    all:unset;
+    cursor:pointer;
+    padding:7px 8px;
+    border-radius:6px;
+    font-size:12.5px;
+    color:var(--ink);
+  }
+  #search-results button:hover{background:var(--accent-soft);}
+  #search-results .sr-topic{
+    font-family:var(--mono);
+    font-size:10.5px;
+    color:var(--accent-strong);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  #search-results .sr-snip{color:var(--ink-soft);}
+  #search-results .sr-snip mark{background:var(--live-bg);color:var(--live-ink);border-radius:2px;}
+  #search-empty{
+    display:none;
+    font-size:12px;
+    color:var(--ink-faint);
+    padding:6px 8px 12px;
+  }
+
+  nav.toc{display:flex;flex-direction:column;gap:14px;}
+  .toc-group-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    padding:0 6px;
+    margin-bottom:2px;
+  }
+  .toc-list{display:flex;flex-direction:column;gap:1px;}
+  .toc-item{
+    all:unset;
+    cursor:pointer;
+    display:flex;
+    align-items:baseline;
+    gap:9px;
+    padding:7px 8px;
+    border-radius:7px;
+    font-size:13.3px;
+    color:var(--ink);
+    line-height:1.35;
+  }
+  .toc-item:hover{background:var(--accent-soft);}
+  .toc-item.active{background:var(--accent-soft);color:var(--accent-strong);font-weight:600;}
+  .toc-num{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-faint);
+    flex:none;
+    width:16px;
+  }
+  .toc-item.active .toc-num{color:var(--accent-strong);}
+  .toc-dot{
+    flex:none;
+    width:6px;height:6px;border-radius:50%;
+    margin-top:6px;
+    background:var(--accent);
+  }
+  .toc-dot.stub{background:var(--ink-faint);}
+  .toc-dot.guest{background:var(--live-border);}
+  .toc-text{flex:1;}
+
+  /* ---------- Main ---------- */
+  main{
+    padding:44px 40px 120px;
+    max-width:820px;
+  }
+  .topic-content, .overview{display:none;}
+  .topic-content.active, .overview.active{display:block;}
+
+  .topic-content h2{
+    font-family:var(--serif);
+    font-size:32px;
+    font-weight:600;
+    line-height:1.2;
+    text-wrap:balance;
+    margin:0 0 6px;
+    color:var(--ink);
+    border-bottom:2px solid var(--line);
+    padding-bottom:16px;
+  }
+  .topic-content h3{
+    font-family:var(--serif);
+    font-size:22px;
+    font-weight:600;
+    margin:38px 0 12px;
+    color:var(--ink);
+  }
+  .topic-content h4{
+    font-family:var(--sans);
+    font-size:15px;
+    font-weight:600;
+    margin:22px 0 8px;
+    color:var(--accent-strong);
+    text-transform:uppercase;
+    letter-spacing:.03em;
+  }
+  .topic-content p{margin:0 0 14px;max-width:70ch;}
+  .topic-content ul, .topic-content ol{margin:0 0 14px;padding-left:22px;max-width:70ch;}
+  .topic-content li{margin-bottom:6px;}
+  .topic-content strong{color:var(--ink);}
+  .topic-content blockquote{
+    margin:18px 0;
+    padding:4px 20px;
+    border-left:3px solid var(--accent);
+    color:var(--ink-soft);
+    font-style:italic;
+  }
+  .topic-content table{
+    border-collapse:collapse;
+    width:100%;
+    margin:16px 0 22px;
+    font-size:14px;
+  }
+  .table-scroll, .topic-content table{display:table;}
+  .topic-content table{display:table;}
+  .tbl-wrap{overflow-x:auto;margin:16px 0 22px;}
+  .topic-content th, .topic-content td{
+    border:1px solid var(--line);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  .topic-content th{
+    background:var(--paper-sunken);
+    font-family:var(--sans);
+    font-weight:600;
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+
+  .live-note{
+    margin:20px 0;
+    padding:15px 19px;
+    background:var(--live-bg);
+    border:1px solid var(--live-border);
+    border-left:4px solid var(--live-border);
+    border-radius:8px;
+    color:var(--live-ink);
+    font-size:14.5px;
+    line-height:1.6;
+  }
+  .live-note p{color:var(--live-ink);}
+  .live-note p:last-child{margin-bottom:0;}
+  .live-note li{color:var(--live-ink);}
+  .live-note p:first-of-type strong:first-of-type{
+    display:block;
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--live-border);
+    margin-bottom:6px;
+  }
+  .live-note h5{
+    margin:0 0 8px;
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:500;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    color:var(--live-border);
+  }
+  .live-note table{margin:10px 0 4px;}
+  .live-note blockquote{border-left-color:var(--live-border);color:var(--live-ink);opacity:.9;}
+
+  .stub{
+    padding:18px 20px;
+    background:var(--stub-bg);
+    border:1px dashed var(--stub-border);
+    border-radius:8px;
+  }
+  .stub-label{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin:0 0 8px;
+  }
+
+  .guest-flag{
+    display:inline-block;
+    margin:0 0 22px;
+    padding:6px 12px;
+    background:var(--live-bg);
+    border:1px solid var(--live-border);
+    color:var(--live-ink);
+    border-radius:20px;
+    font-size:12.5px;
+  }
+
+  /* ---------- Overview ---------- */
+  .overview .kicker{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:8px;
+  }
+  .overview h1{
+    font-family:var(--serif);
+    font-size:38px;
+    font-weight:600;
+    text-wrap:balance;
+    margin:0 0 14px;
+  }
+  .overview .lede{
+    font-size:17px;
+    color:var(--ink-soft);
+    max-width:66ch;
+    margin-bottom:32px;
+  }
+  .stat-row{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:12px;
+    margin-bottom:34px;
+  }
+  .stat{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat .n{
+    font-family:var(--serif);
+    font-size:26px;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+    color:var(--accent-strong);
+  }
+  .stat .l{font-size:12px;color:var(--ink-soft);}
+
+  .overview h2.sec{
+    font-family:var(--serif);
+    font-size:20px;
+    font-weight:600;
+    margin:0 0 14px;
+  }
+  .topic-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+    margin-bottom:34px;
+  }
+  .topic-card{
+    all:unset;
+    cursor:pointer;
+    display:flex;
+    gap:10px;
+    align-items:flex-start;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:13px 14px;
+    box-shadow:var(--shadow);
+  }
+  .topic-card:hover{border-color:var(--accent);}
+  .topic-card .num{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--ink-faint);
+    flex:none;
+    padding-top:2px;
+  }
+  .topic-card .t{font-size:13.8px;line-height:1.4;}
+  .topic-card .badge{
+    display:inline-block;
+    margin-top:5px;
+    font-size:10.5px;
+    font-family:var(--mono);
+    letter-spacing:.03em;
+    padding:1px 7px;
+    border-radius:20px;
+  }
+  .badge.ok{background:var(--accent-soft);color:var(--accent-strong);}
+  .badge.stub{background:var(--stub-bg);color:var(--ink-faint);border:1px solid var(--stub-border);}
+  .badge.guest{background:var(--live-bg);color:var(--live-ink);border:1px solid var(--live-border);}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    margin-bottom:34px;
+    font-size:13px;
+    color:var(--ink-soft);
+  }
+  .legend span{display:inline-flex;align-items:center;gap:7px;}
+  .legend .dot{width:8px;height:8px;border-radius:50%;}
+
+  .about-box{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:20px 22px;
+    box-shadow:var(--shadow);
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:70ch;
+  }
+  .about-box p{margin:0 0 10px;}
+  .about-box p:last-child{margin:0;}
+  .about-box strong{color:var(--ink);}
+
+  .empty-hint{
+    background:var(--paper-raised);
+    border:1px dashed var(--stub-border);
+    border-radius:10px;
+    padding:20px 22px;
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:70ch;
+  }
+  .empty-hint p{margin:0 0 10px;}
+  .empty-hint p:last-child{margin:0;}
+
+  .menu-btn{display:none;}
+
+  @media (max-width: 880px){
+    .app{grid-template-columns:1fr;}
+    .sidebar{
+      position:fixed;
+      z-index:20;
+      left:0;top:0;bottom:0;
+      width:82vw;
+      max-width:320px;
+      transform:translateX(-100%);
+      transition:transform .2s ease;
+      box-shadow:var(--shadow);
+    }
+    .sidebar.open{transform:translateX(0);}
+    .menu-btn{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      position:sticky;
+      top:0;
+      z-index:10;
+      background:var(--paper);
+      border-bottom:1px solid var(--line);
+      padding:14px 16px;
+      font-family:var(--mono);
+      font-size:12px;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--accent-strong);
+    }
+    .menu-btn button{all:unset;cursor:pointer;font:inherit;color:inherit;}
+    main{padding:24px 20px 100px;}
+    .stat-row{grid-template-columns:repeat(2,1fr);}
+    .topic-grid{grid-template-columns:1fr;}
+    .overview h1{font-size:30px;}
+  }
+
+
+  /* ---- Lecture archive additions ---- */
+  .lecture-meta{
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px;
+    margin:0 0 22px;
+    font-size:14px;
+    color:var(--ink-soft);
+    max-width:70ch;
+  }
+  .lecture-meta p{margin:4px 0;}
+  .lecture-meta strong{color:var(--ink);}
+
+  blockquote.warnq{
+    background:var(--live-bg);
+    border:1px solid var(--live-border);
+    border-left:4px solid var(--live-border);
+    border-radius:8px;
+    color:var(--live-ink);
+    padding:14px 18px;
+    margin:18px 0;
+    font-style:normal;
+  }
+  blockquote.warnq p{color:var(--live-ink);margin:6px 0;}
+  blockquote.warnq strong{color:var(--live-ink);}
+  blockquote.warnq ol,blockquote.warnq ul{color:var(--live-ink);}
+
+  .mini-toc{
+    background:var(--paper-sunken);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 18px 16px;
+    margin:0 0 30px;
+    max-width:70ch;
+  }
+  .mini-toc-label{
+    font-family:var(--mono);
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    margin-bottom:8px;
+  }
+  .mini-toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:22px;}
+  .mini-toc li{break-inside:avoid;margin-bottom:5px;}
+  .mini-toc li.lvl-sub{margin-left:14px;font-size:12.8px;}
+  .mini-toc a{
+    color:var(--ink-soft);
+    text-decoration:none;
+    font-size:13.3px;
+    line-height:1.4;
+  }
+  .mini-toc a:hover{color:var(--accent-strong);text-decoration:underline;}
+
+  .lecture-card-preview{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+    background:var(--paper-raised);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .lecture-card-preview .lc-date{font-family:var(--mono);font-size:11px;color:var(--accent-strong);}
+  .lecture-card-preview .lc-teacher{font-size:13px;color:var(--ink-soft);}
+  .lecture-card-preview .lc-topic{font-size:14px;color:var(--ink);}
+  .lecture-card-preview .lc-hw{
+    margin-top:6px;
+    font-size:11px;
+    font-family:var(--mono);
+    color:var(--live-ink);
+    background:var(--live-bg);
+    border:1px solid var(--live-border);
+    border-radius:20px;
+    padding:2px 9px;
+    display:inline-block;
+    width:fit-content;
+  }
+  .lecture-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:34px;}
+  @media (max-width: 880px){ .lecture-grid{grid-template-columns:1fr;} .mini-toc ul{columns:1;} }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <span class="kicker">Магистратура · Мининский университет</span>
+      <span class="title">База данных лекций</span>
+      <span class="sub">Очищенные расшифровки занятий по датам</span>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="search-input" type="text" placeholder="Поиск по всем лекциям…" autocomplete="off">
+    </div>
+    <div id="search-results"></div>
+    <div id="search-empty">Ничего не найдено</div>
+    <nav class="toc" id="toc">
+      <div>
+        <div class="toc-group-label">Обзор</div>
+        <div class="toc-list">
+          <button class="toc-item" data-target="overview"><span class="toc-num">·</span><span class="toc-text">О базе данных</span></button>
+        </div>
+      </div>
+      <div>
+        <div class="toc-group-label">Лекции по датам</div>
+        <div class="toc-list" id="toc-topics"></div>
+      </div>
+    </nav>
+  </aside>
+  <main>
+    <div class="menu-btn"><button id="menu-toggle">☰ Лекции по датам</button></div>
+    <section class="overview active" id="overview">
+      <div class="kicker">Свод расшифровок занятий магистратуры «Психологическое сопровождение служебной деятельности»</div>
+      <h1>База данных лекций</h1>
+      <p class="lede">Здесь собраны очищенные, сверенные с оригиналом расшифровки записанных занятий — по одной на каждую дату. Открывайте лекцию из списка слева или ищите по всему тексту сверху; внутри каждой лекции есть своё мини-оглавление для перехода к конкретной теме.</p>
+      <h2 class="sec">Лекции</h2>
+      <div class="lecture-grid">
+<div class="lecture-card-preview"><span class="lc-date">03.09.2026</span><span class="lc-teacher">Минаева Е.В.</span><span class="lc-topic">Проектирование и практика проведения тренинга в организации</span><span class="lc-hw">📝 есть домашнее задание</span></div>
+<div class="lecture-card-preview"><span class="lc-date">07.09.2026</span><span class="lc-teacher">Алёхин И.А.</span><span class="lc-topic">Профессиональная этика и служебный этикет — предмет этики</span></div>
+<div class="lecture-card-preview"><span class="lc-date">08.09.2026</span><span class="lc-teacher">Суворова</span><span class="lc-topic">Методология психологического исследования</span></div>
+<div class="lecture-card-preview"><span class="lc-date">09.09.2026</span><span class="lc-teacher">Гапонова С.А.</span><span class="lc-topic">Психология профессиональной деятельности и методы исследования</span></div>
+<div class="lecture-card-preview"><span class="lc-date">10.09.2026</span><span class="lc-teacher">Минаева Е.В.</span><span class="lc-topic">Проектирование и практика проведения тренинга в организации (продолжение)</span></div>
+<div class="lecture-card-preview"><span class="lc-date">11.09.2026</span><span class="lc-teacher">Серебрякова Т.А.</span><span class="lc-topic">Основы психологии: история становления психологии как науки</span><span class="lc-hw">📝 есть домашнее задание</span></div>
+<div class="lecture-card-preview"><span class="lc-date">12.09.2026</span><span class="lc-teacher">Ловков С.Г.</span><span class="lc-topic">Коллективное поведение</span></div>
+<div class="lecture-card-preview"><span class="lc-date">12.09.2026</span><span class="lc-teacher">Серебрякова Т.А.</span><span class="lc-topic">Психология развития: предмет, история, закономерности развития</span></div>
+      </div>
+      <h2 class="sec">О базе</h2>
+      <div class="about-box">
+        <p><strong>Как это собирается.</strong> Каждая запись занятия проходит через один и тот же процесс: извлечение аудио → распознавание речи (faster-whisper) → очистка текста с сохранением всех фактов, цифр и имён → сверка с сырой расшифровкой по таймкодам → публикация здесь. Места с неоднозначной атрибуцией реплик или неточно распознанными именами отмечены прямо в тексте лекции амбер-плашками.</p>
+        <p><strong>Обновление.</strong> Новые лекции добавляются в эту базу по мере того, как для них готовится очищенная расшифровка — структура и оформление страницы при этом сохраняются.</p>
+      </div>
+    </section>
+<section class="topic-content" id="lecture-1">
+<h2 id="lecture-1-лекция-1-проектирование-и-практика-проведения-тренинга-в-организации">Лекция 1 — «Проектирование и практика проведения тренинга в организации»</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-1-1-направления-работы-психолога-в-силовых-структурах">1. Направления работы психолога в силовых структурах</a></li>
+<li class="lvl-main"><a href="#lecture-1-2-направления-консультирования">2. Направления консультирования</a></li>
+<li class="lvl-main"><a href="#lecture-1-3-психотерапия-понятие-и-защитные-механизмы">3. Психотерапия: понятие и защитные механизмы</a></li>
+<li class="lvl-main"><a href="#lecture-1-4-прл-психопатия-и-другие-отклонения-с-которыми-сталкивается-психолог">4. ПРЛ, психопатия и другие отклонения, с которыми сталкивается психолог</a></li>
+<li class="lvl-main"><a href="#lecture-1-5-групповая-психологическая-работа-виды">5. Групповая психологическая работа: виды</a></li>
+<li class="lvl-main"><a href="#lecture-1-6-тренинги-сущность-история-специфические-черты">6. Тренинги: сущность, история, специфические черты</a></li>
+<li class="lvl-main"><a href="#lecture-1-7-виды-тренингов">7. Виды тренингов</a></li>
+<li class="lvl-main"><a href="#lecture-1-8-когда-наступает-реальный-результат">8. Когда наступает реальный результат</a></li>
+<li class="lvl-main"><a href="#lecture-1-9-групповая-психокоррекция-и-реабилитация">9. Групповая психокоррекция и реабилитация</a></li>
+<li class="lvl-main"><a href="#lecture-1-10-часть-2-курса-архитектура-и-архитектоника-тренинга-проектирование-т">10. Часть 2 курса — «Архитектура и архитектоника тренинга» (проектирование тренинга)</a></li>
+<li class="lvl-main"><a href="#lecture-1-11-часть-4-курса-групповой-шеринг-и-принципы-его-проведения">11. Часть 4 курса — «Групповой шеринг и принципы его проведения»</a></li>
+<li class="lvl-main"><a href="#lecture-1-домашнее-задание-основные-виды-терапевтических-групп">Домашнее задание: «Основные виды терапевтических групп»</a></li>
+<li class="lvl-sub"><a href="#lecture-1-задание">Задание</a></li>
+<li class="lvl-sub"><a href="#lecture-1-ответ">Ответ</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 03.09.2026 · <strong>Преподаватель:</strong> Минаева Е.В., канд. психол. наук, доцент, клинический психолог<br />
+<strong>Дисциплина:</strong> магистратура, психологическое сопровождение служебной деятельности (силовые структуры)</p>
+<blockquote>
+<p>Это учебный конспект — организационные моменты, знакомство группы, техническая часть занятия и перекличка сюда не включены. Полная расшифровка записи (со всеми оргвопросами) хранится в <a href="1_лекция.md">1_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-1-1-направления-работы-психолога-в-силовых-структурах">1. Направления работы психолога в силовых структурах</h3>
+<p>Два больших направления:</p>
+<p><strong>А) Обеспечение профессиональной деятельности сотрудников</strong><br />
+1. <strong>Диагностика.</strong> Психологический отбор — распространённая практика наряду с другими видами отбора; задача — определить, годен ли человек к профессии. Применяется и в правоохранительных органах, и в судебной практике. Ключевая сложность — не просто владеть методиками, а грамотно интерпретировать результаты. При дифференциальной диагностике сложного случая психиатр запрашивает клинического психолога — тот становится «первой скрипкой» в понимании, что мешает человеку.<br />
+2. <strong>Адаптация к условиям службы.</strong> Базовая функция психики — адаптация к новым условиям. Задача психолога — сделать адаптацию максимально мягкой, чтобы человек остался в профессии.<br />
+3. <strong>Консультирование сотрудников</strong> — по личным вопросам и вопросам взаимодействия с людьми.</p>
+<p><strong>Б) Направления, связанные с подготовкой и психокоррекцией</strong><br />
+- Профилактика выгорания и дистресса.<br />
+- Психологическая экспертиза (близко к диагностике).<br />
+- Сопровождение выполнения служебных задач, развитие профессионально значимых качеств.<br />
+- Подготовка сотрудников: психопрофилактика, организационное консультирование.</p>
+<h3 id="lecture-1-2-направления-консультирования">2. Направления консультирования</h3>
+<p>Направлений в консультировании очень много — выбор определяется теоретической базой психолога.</p>
+<ul>
+<li>На Западе ряд направлений психотерапии входит в структуру ОМС (например, КПТ — 10 бесплатных сессий). В России пока отдельного покрытия нет, но в Москве уже включены 3 посещения психолога по перинатальному направлению в список ОМС.</li>
+<li>Из «доказательных» (evidence-based) направлений чаще всего называют <strong>КПТ</strong> — когнитивно-поведенческую терапию. Истоки — из бихевиоризма (основатель — Дж. Уотсон, опыты на животных, затем на людях). Идея: связь «стимул → реакция», мишень воздействия — поведение.</li>
+<li>Психика не исчерпывается поведением, поэтому существуют другие направления: <strong>психоанализ</strong> (предмет — бессознательное), <strong>гештальт-психология</strong> (предмет — структура психики, а не отдельные элементы; вышла из психоанализа).</li>
+<li>Клиническая диагностика — направление с максимальной ответственностью: клинического психолога могут приглашать в суд для определения вменяемости.</li>
+</ul>
+<h3 id="lecture-1-3-психотерапия-понятие-и-защитные-механизмы">3. Психотерапия: понятие и защитные механизмы</h3>
+<p><strong>Психотерапия</strong> — комплексное лечебное вербальное и невербальное воздействие на эмоции, суждения, самосознание человека при психических, нервных, психосоматических заболеваниях. Различают:<br />
+- <strong>клинически ориентированную</strong> — смягчение/ликвидация симптоматики у нездоровых людей;<br />
+- <strong>личностно-ориентированную</strong> — изменение отношения человека к социальному окружению и собственной личности.</p>
+<p>Психотерапия нацелена на:<br />
+- помощь в выражении «старой боли»;<br />
+- проработку (не устранение!) ригидных защитных механизмов;<br />
+- исследование корней проблем (психоанализ);<br />
+- поиск ресурсов человека для адаптации — в частности, через расширение осознанности.</p>
+<p><strong>Защитные механизмы</strong> — бессознательный процесс, включающийся в момент противоречия между осознаваемым и бессознательным; задача — сохранить целостность «я», не дать ему распасться. Бороться с защитами нужно очень аккуратно: если снять защиту, ничего не дав взамен, можно разрушить психику («сначала дать, потом отбирать»; метафора — разбирая стены ветхого дома, сначала ставят подпорки). Иногда правильнее не убирать механизм, а обозначить и обсудить его. Близкий термин — <strong>копинг</strong> (проработка защиты = набор более эффективных копинг-стратегий взамен).</p>
+<h3 id="lecture-1-4-прл-психопатия-и-другие-отклонения-с-которыми-сталкивается-психолог">4. ПРЛ, психопатия и другие отклонения, с которыми сталкивается психолог</h3>
+<p>Классификации отклонений:<br />
+- <strong>Когнитивные/познавательные нарушения</strong> (память, внимание, мышление) — особенно у людей в хроническом стрессе.<br />
+- <strong>Социально-поведенческие отклонения</strong> (девиантное поведение — может быть и негативным, и «нейтральным», например субкультуры).<br />
+- <strong>Патология характера</strong>: норма → <strong>акцентуация</strong> (крайний вариант нормы) → <strong>психопатия / пограничное расстройство личности (ПРЛ)</strong>. Для ПРЛ/психопатии характерны: сложности с управлением эмоциями, частые серьёзные срывы в отношениях, недоверие; «психопаты постоянны в своём непостоянстве» — в отличие от акцентуанта, адаптироваться человеку с ПРЛ очень сложно.<br />
+- <strong>Интеллектуальные нарушения.</strong><br />
+- <strong>ПТСР</strong> — «приобретённая» проблема, с которой психологи силовых структур сталкиваются часто.<br />
+- <strong>Самоповреждающее поведение</strong> — чаще у подростков с эмоционально уязвимой психикой.<br />
+- <strong>Эмоционально-волевая сфера</strong>: эмоциональное выгорание, тревожное расстройство, депрессия, суицидальное поведение (как возможное следствие депрессии).</p>
+<p><strong>Психокоррекция</strong> — диагностика соответствия норме + воздействие с целью развития/восстановления качеств + воздействие с целью адаптации к изменившимся условиям + приведение состояния человека к привычным для него нормам.</p>
+<h3 id="lecture-1-5-групповая-психологическая-работа-виды">5. Групповая психологическая работа: виды</h3>
+<table>
+<thead>
+<tr>
+<th>Форма</th>
+<th>Особенности</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Группа психологической помощи</strong></td>
+<td>Не ограничена по времени; нет жёсткой тематической структуры; состав может меняться; результаты отсрочены. Рекомендованное чтение — Ирвин Ялом.</td>
+</tr>
+<tr>
+<td><strong>Группа самопомощи</strong></td>
+<td>Непрофессиональная помощь, может работать без психолога (анонимные алкоголики/наркозависимые, форумы взаимопомощи).</td>
+</tr>
+<tr>
+<td><strong>Группа поддержки</strong></td>
+<td>Форма психологической помощи с профессиональным ведущим, использующим групповую динамику как инструмент.</td>
+</tr>
+<tr>
+<td><strong>Группа личностного роста</strong></td>
+<td>Для психически здоровых людей; задачи — осознание ресурсов, самоактуализация, принятие себя. Может быть закрытой или открытой (открытая — сложнее: каждый новый участник требует заново пройти этап знакомства).</td>
+</tr>
+<tr>
+<td><strong>Тренинговая группа</strong></td>
+<td><strong>Всегда закрытая</strong> — набранный состав фиксируется и последовательно проходит все этапы групповой динамики.</td>
+</tr>
+<tr>
+<td><strong>Психотерапевтическая группа</strong></td>
+<td>Не регламентирована жёсткой тематической структурой; ведущий не приносит тему сам, а даёт участникам возможность поделиться («как прошла неделя?») — классический психодинамический подход. Состав — либо психически здоровые люди (нацелена на личностный рост), либо люди с психическими заболеваниями (терапевтическая группа — улучшение самочувствия, поддержание ремиссии; вести должен психиатр/клинический психолог).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Периодичность встреч</strong> — обязательное условие для любой групповой работы. Традиционная периодичность — раз в неделю (исключения: реконструктивная психотерапия — ежедневно, психоанализ — не менее 3 раз в неделю).</p>
+<h3 id="lecture-1-6-тренинги-сущность-история-специфические-черты">6. Тренинги: сущность, история, специфические черты</h3>
+<p>Тренинг — структурированная, ограниченная во времени работа с закрытой группой психически здоровых людей, интенсивный формат общения, ориентированный на решение психологических проблем и самосовершенствование.</p>
+<p><strong>Родоначальник групповой психотерапии</strong> — Джейкоб Морено (автор социодрамы и социометрии). Ввёл понятие групповой психотерапии в 1932 году, в 1931 году организовал профессиональный журнал по теме.</p>
+<p><strong>Специфические черты тренинга</strong> (по И. В. Вачкову):<br />
+1. Соблюдение принципов групповой работы.<br />
+2. Направленность на психологическую помощь в саморазвитии — причём помощь идёт не только от ведущего, но и от самих участников (примерно 50/50).<br />
+3. Наличие постоянной группы, как правило 7–15 человек.<br />
+4. Может работать непрерывно 2–5 дней (группа-марафон) или с периодичностью — чаще несколько дней подряд.<br />
+5. Чаще офлайн-формат (хотя допустим и онлайн).<br />
+6. Акцент на взаимодействие <strong>«здесь и сейчас»</strong> (в отличие от психотерапевтической группы, где обсуждают «там и тогда»).<br />
+7. Обязательна вербализация и рефлексия — на неё не жалеют времени.</p>
+<p>Мастерство тренера — за короткое время создать атмосферу безопасности и доверия («комплайнса»): без этого дальнейшая работа бессмысленна.</p>
+<h3 id="lecture-1-7-виды-тренингов">7. Виды тренингов</h3>
+<ul>
+<li><strong>Тренинг навыков</strong> — освоение конкретных поведенческих навыков; жёстко структурирован, чёткие критерии оценки (навык появился/нет). Примеры сфер: навыки продаж, телефонное информирование, поведение в конкретных ситуациях.</li>
+<li><strong>Тренинг умений</strong> — актуализация и развитие психологических умений/качеств. Разновидность — <strong>социально-психологический тренинг</strong> (развитие коммуникативной компетентности: установление контакта, снятие внутренних барьеров, анализ своего и чужого поведения, понимание и прогнозирование реакций).</li>
+<li>Подвид — <strong>тренинг формирования команды / групповой коучинг</strong>: сплочение коллектива, разрешение внутригрупповых конфликтов, адаптация новичков, развитие уверенности в себе.</li>
+<li><strong>По длительности</strong>: <strong>трек</strong> (1 день, 1,5–8 часов) → <strong>краткосрочный тренинг</strong> (9–10 часов до 3–5 дней) → <strong>пролонгированный тренинг</strong> (1,5–3 часа, 1–2 раза в неделю, несколько месяцев).</li>
+<li><strong>Тренинг личностного роста</strong> — раскрытие личностного потенциала, гибкая тематическая структура. Форматы: интенсивный краткосрочный (3–9 дней по 6 ч/день) и пролонгированный. Отдельно — <strong>тренинг-марафон</strong>: непрерывное погружение от суток до нескольких дней, ведущие могут сменяться.</li>
+</ul>
+<h3 id="lecture-1-8-когда-наступает-реальный-результат">8. Когда наступает реальный результат</h3>
+<p>Принципиальное отличие консультирования от психотерапии:<br />
+- <strong>Психотерапия</strong> — перестройка личностной структуры (личность меняется).<br />
+- <strong>Консультирование</strong> — в большей степени поведенческие изменения (навыки), личность меняется не так сильно.</p>
+<p>Заметная личностная перестройка обычно наступает не раньше, чем через <strong>год</strong> регулярных встреч. Тренинг длится существенно меньше (2–3 дня) — поэтому <strong>не стоит рассчитывать на результат сразу после тренинга</strong>. Даже навыковый тренинг за 2–3 дня закладывает лишь предпосылки. По разным источникам, реальные изменения проявляются не ранее чем через полгода (по личной оценке лектора — ближе к 9 месяцам–году). Тренинг — «волшебный пинок», дающий толчок, эффект от которого проявляется позже.</p>
+<p><strong>Модель осознания проблемы клиентом:</strong><br />
+1. <strong>Неосознанное незнание</strong> — человек не знает и не осознаёт, что чего-то не знает.<br />
+2. <strong>Осознанное незнание</strong> — человек начинает понимать, что именно он не знает.<br />
+3. Попытка действия / отработка навыка — сопровождается ошибками, лишь постепенно навык «становится своим».</p>
+<p>Задача психолога — честно показывать клиенту, в чём произошёл сдвиг, даже если внешне («поведенчески») ничего не изменилось — например, изменилось понимание истинных причин своей ситуации.</p>
+<p><strong>Правила психологу:</strong><br />
+- Мы никого не спасаем, мы помогаем — «спасательство» (тянуть клиента, решать за него) — профессиональная проблема самого психолога.<br />
+- Любая проблема субъективна — то, что проблема для психолога, может не быть проблемой для клиента.<br />
+- Работа психолога — не про «жить или не жить» (это врач), а про <strong>качество жизни</strong>.<br />
+- Уход клиента — нормальная часть практики; важно проработать своё отношение к этому (личная терапия, супервизии, интервизии, профессиональное сообщество), чтобы это не стало триггером выгорания.</p>
+<h3 id="lecture-1-9-групповая-психокоррекция-и-реабилитация">9. Групповая психокоррекция и реабилитация</h3>
+<ul>
+<li><strong>Групповая психокоррекция</strong> — работа с людьми, имеющими отклонение от нормы; структурирована, часто пролонгирована, строится исходя из специфики контингента.</li>
+<li><strong>Групповая реабилитация</strong> — работа с людьми, перенёсшими психическую травму, во взаимодействии с психиатром; близка к коррекции, может включать отработку недавно возникших переживаний.</li>
+</ul>
+<hr />
+<h3 id="lecture-1-10-часть-2-курса-архитектура-и-архитектоника-тренинга-проектирование-т">10. Часть 2 курса — «Архитектура и архитектоника тренинга» (проектирование тренинга)</h3>
+<p><strong>Термины.</strong> Архитектура тренинга — общее строение, проект действий на занятиях. Архитектоника — соразмерность частей (по смыслу, времени, последовательности тем).</p>
+<p><strong>С чего начинается разработка тренинга:</strong><br />
+- <strong>Целеполагание и целевая группа</strong> — для чего проводится тренинг и для кого. Цель и целевая группа — важнейшие категории, от них зависит и строение тренинга, и подбор упражнений. Формулировка цели — точная и позитивная (без частицы «не»): к чему участник должен прийти, а не от чего «убежать». Слишком широкая цель/группа → ошибочное применение тренинга.</p>
+<p><strong>Временные границы:</strong><br />
+- Взрослые участники выдерживают <strong>3–4 часа</strong> упражнений на личностный рост (с перерывом через 1,5–2 часа); тренированные психологи — 6–8 часов.<br />
+- Мотивированные участники способны системно посещать <strong>до 12 занятий</strong> (иногда до 16) раз в неделю; если число занятий заранее не ограничено — начинают пропускать, эффективность группы падает.</p>
+<p><strong>Законы эффективности тренинга:</strong><br />
+- закон разрастания объёма (аналог закона Паркинсона — работа заполняет всё отведённое время);<br />
+- закон «смены картины мира» — картина мира меняется в течение <strong>полугода</strong>; эффект развивающего тренинга проявляется уже после его завершения;<br />
+- закон «волшебного пинка» — тренинг сам не есть развитие, а лишь толчок к нему;<br />
+- закон тройного прикосновения — мысль становится «своей», только дойдя до сознания не менее трёх раз при разных обстоятельствах.</p>
+<p><strong>«Неэффективное время», которое нужно закладывать отдельно:</strong> ориентация/адаптация — ~20 мин; стабилизация — ~5 мин; перерывы — 15–20 мин до часа (короче 15 мин — неэффективны); стретч-брейки — 10–15 мин (на случай конфликтов/напряжения); отвлечения — 20–30 мин.</p>
+<p><strong>Насыщенность и структура занятия:</strong> 1–3 разминки + 1–2 (редко 3) целевых упражнения + завершающее упражнение/обсуждение. Ориентир — цикл 5–7 занятий. Структура: вступительная часть → основная (упражнения + обсуждение) → заключительная (итоги, план самостоятельной работы).</p>
+<p><strong>Подбор и описание упражнения.</strong> Вопросы тренеру перед выбором: какой опыт стимулирует упражнение; какие возможны побочные результаты и не вредны ли они; как опыт связан с предыдущим/последующим упражнением. Описание упражнения включает: цель, инструкцию, время, пояснения, модификации.</p>
+<p><strong>Мониторинг эффективности:</strong> анкета с 10-балльной шкалой. Средняя оценка ниже <strong>7–8</strong> — повод задуматься об изменениях; ниже <strong>5–6</strong> — сигнал тревоги, нужен серьёзный пересмотр. Процедуры: сначала занятия с коллегами-наблюдателями; на «первом прокате» наблюдатель может быть инкогнито (со-ведущий/участник). Альтернатива — описательный (качественный) отзыв.</p>
+<p><strong>Схема анализа занятия (по И. В. Вачкову):</strong> тема и время; состав участников; план занятия; удачные/неудавшиеся упражнения; интересный случай; особенности поведения участников; ошибки, которые нужно учесть; методические находки.</p>
+<p><strong>Наблюдение тренера за группой</strong> — три «точки отсчёта»: динамика развития группы; стадии развития тренинга; «зоны ближайшего развития» (мишени) каждого участника.</p>
+<h3 id="lecture-1-11-часть-4-курса-групповой-шеринг-и-принципы-его-проведения">11. Часть 4 курса — «Групповой шеринг и принципы его проведения»</h3>
+<p><strong>Шеринг</strong> (от англ. <em>to share</em>) — высказывание чувств, мыслей, систематизация опыта. Без шеринга упражнение теряет до <strong>90%</strong> эффективности; обязателен после любого упражнения, кроме разминочных.</p>
+<p><strong>Цели шеринга:</strong> доверительная атмосфера; проживание и осознание опыта; обмен ресурсами между участниками; обратная связь; закрепление материала; мотивация и поддержка.</p>
+<p><strong>Виды по форме:</strong> нераскрученный (без обсуждения) / раскрученный (с обсуждением); направленный (к теме) / ненаправленный (спонтанный).<br />
+<strong>Виды по назначению:</strong> первый (начало тренинга) → стартовый (перед каждым занятием) → целевой (после целевых упражнений) → заключительный (итоги занятия) → итоговый (итоги всей программы).</p>
+<p><strong>Правила тренера:</strong> добровольность; конфиденциальность; безоценочность; активное слушание; «я-высказывания»; тайминг.</p>
+<p><strong>Модель «What? So What? Now What?»</strong> (Д. Колб, Дж. Дьюи):<br />
+1. <strong>What?</strong> — факты: что произошло, что видели/слышали. Цель — отделить факты от интерпретаций.<br />
+2. <strong>So What?</strong> — осмысление: что это значит лично для меня, какие чувства, какой вывод. Самый важный, аналитический этап — извлечь инсайты.<br />
+3. <strong>Now What?</strong> — план: как я буду действовать в похожей ситуации, какой первый шаг.</p>
+<p><strong>Технологии применения упражнений:</strong><br />
+- <strong>Разминка</strong> — короткое упражнение для включения активности; учитывать групповую динамику и этап занятия.<br />
+- <strong>Виды психогимнастических упражнений</strong> (по Т. Г. Бобченко): разогревающие; повышающие сплочённость; формирующие доверие; на изучение структуры отношений (социометрические); на снятие агрессивности; преодолевающие усталость (релаксационные); на формирование установки и умения.<br />
+- <strong>Модерация</strong> — метод выработки группой коллективного понятия: тренер ставит задачу → подгруппы решают её на карточках → представители размещают карточки на доске → тренер вместе с группой структурирует их в целостную схему. Результат лучше усваивается, поскольку это «коллективное произведение».<br />
+- <strong>Ролевая игра</strong> — моделирование ситуации с распределением ролей. Виды: сюжетная/сценарная (роли заранее) и спонтанная/импровизационная (без подготовки). Отдельно — деловые игры и анализ конкретных случаев (по О. В. Евтихову: участник описывает проблему → группа задаёт уточняющие вопросы → каждый предлагает решение → выбор наиболее подходящего).<br />
+- <strong>Медитация</strong> — сосредоточение на образах: визуализация, управляемое воображение, имплозия.<br />
+- <strong>Проективное рисование</strong> — выражение в рисунке личностных проблем и переживаний; формы — свободное, тематическое, дополнительное, совместное, разговорное рисование.</p>
+<hr />
+<h3 id="lecture-1-домашнее-задание-основные-виды-терапевтических-групп">Домашнее задание: «Основные виды терапевтических групп»</h3>
+<h4 id="lecture-1-задание">Задание</h4>
+<ol>
+<li>Соотношение понятий «групповая психотерапия», «групповая психокоррекция» и «групповой тренинг». Общее представление о психологическом тренинге. Специфические черты и основные парадигмы тренинга.</li>
+<li>Классификация и основные виды тренинговых групп. Критерии классификации. Гештальт-подход. Группаналитический подход. Трансакционный анализ в группе. Психодраматический подход. Телесно-ориентированный подход. Методы групповой работы в НЛП.</li>
+</ol>
+<h4 id="lecture-1-ответ">Ответ</h4>
+<p><strong>1. Соотношение понятий</strong></p>
+<p>Все три формы — разновидности групповой психологической работы, но различаются по цели, глубине воздействия и составу участников:</p>
+<ul>
+<li><strong>Групповая психотерапия</strong> — направлена на <strong>людей с психологическими (порой психическими) трудностями</strong>, нацелена на перестройку личностной структуры. Не имеет жёсткой тематической структуры, состав может быть открытым, работа идёт «там и тогда» (с прошлым опытом), результат — глубокие и стойкие личностные изменения, наступающие обычно не раньше чем через год регулярной работы.</li>
+<li><strong>Групповая психокоррекция</strong> — направлена на <strong>коррекцию конкретных отклонений от нормы</strong> (в поведении, эмоциональной сфере, коммуникации) у психически здоровых или пограничных клиентов; работа более прицельная и структурированная, чем психотерапия, но менее жёстко ограничена по времени, чем тренинг.</li>
+<li><strong>Групповой тренинг</strong> — самая структурированная и ограниченная во времени форма; работает <strong>только со здоровыми людьми</strong>, всегда с закрытым составом, фокус — «здесь и сейчас», цель — конкретный, измеримый результат (навык, умение, изменение установки) за короткий срок. Тренинг — толчок к изменению («волшебный пинок»), а не само изменение: устойчивый эффект проявляется позже, уже после его завершения.</li>
+</ul>
+<p>Иначе говоря: <strong>тренинг</strong> — про навык и здесь-и-сейчас; <strong>психокоррекция</strong> — про исправление конкретного отклонения; <strong>психотерапия</strong> — про глубокую и долгую перестройку личности.</p>
+<p><strong>Специфические черты тренинга</strong> (по Вачкову): соблюдение принципов групповой работы; направленность на саморазвитие через активность самих участников (не только ведущего); постоянная группа 7–15 человек; работа «здесь и сейчас»; обязательная рефлексия/вербализация; атмосфера безопасности как условие результата.</p>
+<p><strong>Основные парадигмы (подходы) тренинга</strong> — то, на какую теоретическую модель психики опирается тренер:<br />
+- <strong>поведенческая (бихевиористская)</strong> парадигма — тренинг как дрессура/выработка навыка через многократное повторение (классический тренинг навыков);<br />
+- <strong>гуманистическая</strong> парадигма — тренинг как создание условий для собственного личностного роста участника (тренер не учит, а сопровождает);<br />
+- <strong>психоаналитическая/психодинамическая</strong> парадигма — тренинг как работа с групповой динамикой и бессознательными процессами группы;<br />
+- <strong>когнитивная</strong> парадигма — тренинг как изменение установок/убеждений через осознание и переосмысление.</p>
+<p><strong>2. Классификация тренинговых групп</strong></p>
+<p>Классифицировать тренинговые группы можно по нескольким независимым критериям одновременно:<br />
+- <strong>по составу</strong> — открытые/закрытые (тренинг — всегда закрытая группа);<br />
+- <strong>по цели</strong> — тренинг навыков, тренинг умений, социально-психологический тренинг, тренинг личностного роста, тренинг формирования команды;<br />
+- <strong>по длительности</strong> — трек (1 день), краткосрочный (до нескольких дней), пролонгированный (месяцы), марафон (без перерыва несколько дней);<br />
+- <strong>по теоретическому подходу (парадигме)</strong> — гештальт-подход, группаналитический подход, транзактный анализ, психодраматический подход, телесно-ориентированный подход, НЛП-подход и др. (см. ниже).</p>
+<p><strong>Основные теоретические подходы к групповой работе:</strong></p>
+<ul>
+<li><strong>Гештальт-подход.</strong> В основе — работа с целостным опытом «здесь и сейчас», осознавание (awareness) собственных чувств, потребностей и незавершённых ситуаций («незакрытых гештальтов»). Ведущий фокусирует внимание участника на том, что происходит в моменте (телесные ощущения, эмоции), а не на анализе прошлого. Классический приём — работа с «горячим стулом» (диалог с значимой фигурой или частью себя).</li>
+<li><strong>Группаналитический подход</strong> (групповой психоанализ, основоположник — З. Х. Фоукс). Группа рассматривается как единый организм («групповая матрица»), а происходящее в ней — как отражение бессознательных процессов каждого участника и группы в целом. Ведущий минимально структурирует процесс, давая группе самой порождать темы и конфликты, которые затем анализируются с точки зрения переноса, сопротивления и группового бессознательного.</li>
+<li><strong>Трансакционный анализ (ТА) в группе</strong> (Э. Берн). Работа строится вокруг понятий эго-состояний <strong>Родитель — Взрослый — Ребёнок</strong>, транзакций между людьми, «игр» и жизненных сценариев. В группе участники учатся распознавать, из какого эго-состояния они действуют, разбирают повторяющиеся деструктивные транзакции и «игры» между участниками, вырабатывают более осознанные (взрослые) способы взаимодействия.</li>
+<li><strong>Психодраматический подход</strong> (Дж. Морено — тот же автор, что стоит у истоков групповой психотерапии в целом). Участник («протагонист») разыгрывает значимую для себя ситуацию с помощью других участников группы (они играют роли значимых людей — «вспомогательные я»), под руководством режиссёра (тренера). Используются техники обмена ролями, дублирования, зеркала. Цель — через действие, а не только разговор, прожить и переосмыслить ситуацию, найти новые способы поведения в ней.</li>
+<li><strong>Телесно-ориентированный подход</strong> (восходит к В. Райху). Исходит из идеи, что психологические проблемы и защитные механизмы отражаются в теле в виде хронических мышечных зажимов («мышечный панцирь»). Работа в группе строится через телесные упражнения, дыхательные техники, работу с движением и контактом — освобождение тела помогает освободить и связанные с ним подавленные эмоции.</li>
+<li><strong>Методы групповой работы в НЛП</strong> (нейролингвистическое программирование). Акцент на моделировании эффективных стратегий поведения и работе с субъективным языковым описанием опыта участника. В группе используются техники «якорения» состояний, работы с субмодальностями восприятия, рефрейминга (изменения смысла ситуации через смену контекста), демонстрационных «форматов» на добровольце с последующей отработкой в парах/тройках.</li>
+</ul>
+<p><strong>Общий вывод:</strong> каждый из этих подходов даёт тренеру свой язык описания того, что происходит в группе, и свой набор техник — но во всех случаях группа используется как инструмент, усиливающий индивидуальную работу за счёт групповой динамики, обратной связи от участников и эффекта «я не один с этой проблемой».</p>
+<p><strong>Литература по теме:</strong> Вачков И. В. Основы технологии группового тренинга. — М., 1999; Кондрашенко В. Т., Донской Д. И. Общая психотерапия. — Минск, 1997.</p>
+</section>
+<section class="topic-content" id="lecture-2">
+<h2 id="lecture-2-лекция-2-предмет-этики-и-её-роль-в-духовной-жизни-общества">Лекция 2 — «Предмет этики и её роль в духовной жизни общества»</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-2-1-происхождение-терминов-этика-и-мораль">1. Происхождение терминов «этика» и «мораль»</a></li>
+<li class="lvl-main"><a href="#lecture-2-2-три-компонента-морали">2. Три компонента морали</a></li>
+<li class="lvl-main"><a href="#lecture-2-3-сущность-и-содержание-этики">3. Сущность и содержание этики</a></li>
+<li class="lvl-main"><a href="#lecture-2-4-принципы-этического-познания">4. Принципы этического познания</a></li>
+<li class="lvl-main"><a href="#lecture-2-5-этические-регулятивы-концепции">5. Этические регулятивы (концепции)</a></li>
+<li class="lvl-main"><a href="#lecture-2-6-разновидности-этических-теорий">6. Разновидности этических теорий</a></li>
+<li class="lvl-main"><a href="#lecture-2-7-функции-этики">7. Функции этики</a></li>
+<li class="lvl-main"><a href="#lecture-2-8-основные-категории-этики">8. Основные категории этики</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 07.09.2026 · <strong>Преподаватель:</strong> Алёхин И.А.<br />
+<strong>Дисциплина:</strong> магистратура, курс «Профессиональная этика и служебный этикет»</p>
+<blockquote>
+<p>Это учебный конспект — организационные вопросы (расписание, баллы, технические неполадки) сюда не включены. Полная расшифровка — в <a href="2_лекция.md">2_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-2-1-происхождение-терминов-этика-и-мораль">1. Происхождение терминов «этика» и «мораль»</h3>
+<p>Термин <strong>«этика»</strong> происходит от греческого слова «этос» (обычай, характер) — категорию ввёл <strong>Аристотель</strong>, чтобы обозначить человеческие качества характера — «этические добродетели» (добро, честность, щедрость, зло и т. д.).</p>
+<p>Термин <strong>«мораль»</strong> связывают с <strong>Цицероном</strong>.</p>
+<p><strong>Соотношение понятий:</strong> этика — это сфера теоретического знания, наука, изучающая мораль. Одни исследователи отождествляют «мораль» и «нравственность» как синонимы, другие считают, что этика изучает их как разные, хотя и близкие явления.</p>
+<h3 id="lecture-2-2-три-компонента-морали">2. Три компонента морали</h3>
+<ol>
+<li><strong>Моральное сознание</strong> — знания о традициях, обычаях, нормах.</li>
+<li><strong>Моральное отношение</strong> — как человек относится к этим нормам, обсуждает их, занимает позицию.</li>
+<li><strong>Моральная деятельность</strong> — реальные поступки.</li>
+</ol>
+<p>Ни одному компоненту нельзя отдать безусловный приоритет — поступки не возникают без сознания и отношения.</p>
+<h3 id="lecture-2-3-сущность-и-содержание-этики">3. Сущность и содержание этики</h3>
+<p><strong>Сущность этики</strong> — система научных знаний о происхождении, сущности и законах развития морали как общественного явления, а также о формировании нравственной личности.</p>
+<p><strong>Содержание этики</strong> (шесть компонентов):<br />
+1. Общая категория морали — методологические, гносеологические, мировоззренческие проблемы этики и морали.<br />
+2. История этики и морали — возникновение, развитие, этические школы и учения.<br />
+3. Взаимосвязь этических норм и принципов.<br />
+4. Теория управления нравственными процессами.<br />
+5. Мораль жизнедеятельности — войны, экология, терроризм, демография.<br />
+6. Профессиональная этика.</p>
+<h3 id="lecture-2-4-принципы-этического-познания">4. Принципы этического познания</h3>
+<ol>
+<li><strong>Принцип оценки человеческих поступков и социальных явлений</strong> — с позиции добра или зла.</li>
+<li><strong>Принцип относительности этико-нравственной оценки</strong> — однозначных «чёрно-белых» оценок, как правило, не бывает; оценки меняются со временем и в разных ситуациях.</li>
+<li><strong>Принцип объективно-субъективного характера нравственных оценок</strong> — связан со способностью субъекта к оценке, с одной стороны, и с выражением собственного интереса — с другой.</li>
+</ol>
+<p>Иллюстрация принципа относительности/объективности: одно и то же явление (например, тестовая vs. живая оценка знаний, роль искусственного интеллекта в психологии) может оцениваться по-разному в зависимости от позиции наблюдателя — однозначного правильного ответа здесь не существует именно в силу этих принципов.</p>
+<h3 id="lecture-2-5-этические-регулятивы-концепции">5. Этические регулятивы (концепции)</h3>
+<table>
+<thead>
+<tr>
+<th>Концепция</th>
+<th>Суть</th>
+<th>Представители</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Гедонизм</strong></td>
+<td>Поступки объясняются стремлением к наслаждению</td>
+<td>Демокрит, Эпикур</td>
+</tr>
+<tr>
+<td><strong>Эвдемонизм</strong></td>
+<td>Поступки связаны с тем, что для человека является счастьем</td>
+<td>Аристотель, Цицерон</td>
+</tr>
+<tr>
+<td><strong>Аскетизм</strong></td>
+<td>Этика — довольствоваться малым, только необходимым</td>
+<td>Диоген, Антисфен</td>
+</tr>
+<tr>
+<td><strong>Стоицизм</strong></td>
+<td>Регулятор жизни через самообладание и принятие судьбы</td>
+<td>Зенон (основатель), далее римские философы</td>
+</tr>
+<tr>
+<td><strong>Теологическая концепция</strong></td>
+<td>Нравственность носит религиозную окраску</td>
+<td>Августин Блаженный</td>
+</tr>
+<tr>
+<td><strong>Прагматическая концепция</strong></td>
+<td>Ценность поступка определяется его практическим результатом</td>
+<td>Пирс, Джеймс, Дьюи (амер. прагматисты)</td>
+</tr>
+<tr>
+<td><strong>Гуманистическая концепция</strong></td>
+<td>В центре — человек, сострадание, развитие личности</td>
+<td>Протагор (истоки), далее философы Возрождения, Кант, Шопенгауэр; в России — Чернышевский, Достоевский, Соловьёв</td>
+</tr>
+<tr>
+<td><strong>Социальное направление</strong></td>
+<td>Мораль как продукт общественного договора/устройства</td>
+<td>Т. Гоббс (основоположник), Руссо, Дидро, Гельвеций; в России — Маркс, Энгельс, Ленин</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lecture-2-6-разновидности-этических-теорий">6. Разновидности этических теорий</h3>
+<ul>
+<li><strong>Натуралистическое направление</strong> — мораль коренится в природе человека, естественности. Представители: Дарвин, Лафарг; в России — Кропоткин.</li>
+<li><strong>Теологическое направление</strong> — опирается на мировые религии (христианство, ислам, буддизм), которые формируют представления о допустимом и благом.</li>
+<li><strong>Антропологическое направление</strong> — мораль коренится в самой природе человека как установка на добро, способствующая самосохранению. Представители: Юм, Спиноза.</li>
+<li><strong>Социальное направление</strong> — см. таблицу выше (Гоббс, Руссо, Дидро, Гельвеций, Маркс, Энгельс, Ленин).</li>
+</ul>
+<h3 id="lecture-2-7-функции-этики">7. Функции этики</h3>
+<ul>
+<li><strong>Мировоззренческая</strong> — формирование мировоззрения.</li>
+<li><strong>Аксиологическая</strong> — ценностная.</li>
+<li><strong>Просветительская.</strong></li>
+<li><strong>Воспитательная.</strong></li>
+</ul>
+<h3 id="lecture-2-8-основные-категории-этики">8. Основные категории этики</h3>
+<ol>
+<li><strong>Благо</strong> — наиболее общая этическая категория, служит для удовлетворения потребностей человека.</li>
+<li><strong>Добро и зло</strong> — оценочные понятия.</li>
+<li><strong>Справедливость</strong> — выражает меру (масштаб) добра или зла.</li>
+<li><strong>Долг.</strong></li>
+<li><strong>Честь и достоинство.</strong></li>
+<li><strong>Совесть.</strong></li>
+<li><strong>Стыд</strong> — категория, близкая совести, порой её практическое проявление.</li>
+</ol>
+</section>
+<section class="topic-content" id="lecture-3">
+<h2 id="lecture-3-лекция-3-методология-психологического-исследования">Лекция 3 — «Методология психологического исследования»</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-3-1-что-такое-методология">1. Что такое методология</a></li>
+<li class="lvl-main"><a href="#lecture-3-2-структура-магистерской-диссертации">2. Структура магистерской диссертации</a></li>
+<li class="lvl-main"><a href="#lecture-3-3-дескриптивная-и-прескриптивная-нормативная-методология">3. Дескриптивная и прескриптивная (нормативная) методология</a></li>
+<li class="lvl-main"><a href="#lecture-3-4-исторический-кризис-методологии-в-психологии">4. Исторический кризис методологии в психологии</a></li>
+<li class="lvl-main"><a href="#lecture-3-5-уровни-методологии-психологического-исследования">5. Уровни методологии психологического исследования</a></li>
+<li class="lvl-main"><a href="#lecture-3-6-естественно-научная-и-гуманитарная-парадигмы">6. Естественно-научная и гуманитарная парадигмы</a></li>
+<li class="lvl-main"><a href="#lecture-3-7-исторические-типы-методологии-науки">7. Исторические типы методологии науки</a></li>
+<li class="lvl-sub"><a href="#lecture-3-позитивизм">Позитивизм</a></li>
+<li class="lvl-sub"><a href="#lecture-3-нормальный-закон-распределения">Нормальный закон распределения</a></li>
+<li class="lvl-sub"><a href="#lecture-3-сциентизм-и-антисциентизм">Сциентизм и антисциентизм</a></li>
+<li class="lvl-sub"><a href="#lecture-3-неопозитивизм">Неопозитивизм</a></li>
+<li class="lvl-sub"><a href="#lecture-3-постпозитивизм-с-1960-х-годов">Постпозитивизм (с 1960-х годов)</a></li>
+<li class="lvl-main"><a href="#lecture-3-8-задание-к-следующему-занятию">8. Задание к следующему занятию</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 08.09.2026 · <strong>Преподаватель:</strong> Суворова<br />
+<strong>Дисциплина:</strong> магистратура, курс методологии психологического исследования</p>
+<blockquote>
+<p>Это учебный конспект — организационные вопросы (перекличка, баллы, обсуждение вузов) сюда не включены. Полная расшифровка — в <a href="3_лекция.md">3_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-3-1-что-такое-методология">1. Что такое методология</h3>
+<p>Этимология: <strong>методос</strong> (путь, метод) + <strong>логос</strong> (наука, разум) — «наука о путях/методах исследования».</p>
+<ul>
+<li><strong>В узком смысле</strong> — наука о методах, о системе инструментов познания.</li>
+<li><strong>В широком смысле</strong> — не просто методы, а глобальные подходы и способы познания, связанные с позицией исследователя: его научно-философским мировоззрением, принадлежностью к исследовательской школе, ценностями.</li>
+</ul>
+<p>Методология выступает в двух ипостасях:<br />
+1. <strong>Как система знаний</strong> — как проводить исследование, в какой логике, какие выбирать методы, как формировать выборку.<br />
+2. <strong>Как система деятельности</strong> — организация самой исследовательской работы (работа с испытуемыми, выборками, данными).</p>
+<h3 id="lecture-3-2-структура-магистерской-диссертации">2. Структура магистерской диссертации</h3>
+<p>Три главы:<br />
+1. <strong>Теоретическая</strong> — определение понятий, теоретическая позиция, разбор существующих исследований.<br />
+2. <strong>Эмпирическая</strong> — диагностика (тесты, опросники), измерение связей между показателями; эксперимента как такового нет.<br />
+3. <strong>Экспериментальная</strong> — обязательна формула эксперимента: <strong>фактор воздействия → результирующий признак</strong> (F→R, по аналогии со «стимул → реакция» у бихевиористов). Без управляемого фактора воздействия эксперимента формально нет — есть просто диагностическое исследование.</p>
+<p>На уровне магистратуры не требуется полностью оригинальное («авторское») определение понятия — допустима и общепринята практика сформировать «рабочее определение», опираясь на 2–3 источника с явным указанием, чьи определения используются.</p>
+<h3 id="lecture-3-3-дескриптивная-и-прескриптивная-нормативная-методология">3. Дескриптивная и прескриптивная (нормативная) методология</h3>
+<ul>
+<li><strong>Дескриптивная методология</strong> — учение о структуре научного знания: как структурировать теоретические, эмпирические, экспериментальные знания по изучаемой проблеме (построение теоретической модели явления).</li>
+<li><strong>Прескриптивная (нормативная) методология</strong> — нормы, которые нужно соблюдать: как строится модель, какие нормы применяются при формировании выборки, проведении эксперимента, взаимодействии с испытуемыми, описании и представлении результатов.</li>
+</ul>
+<p><strong>Теория vs концепция:</strong> теория — эмпирически подтверждённая концепция, более широкое системное описание явления. Концепция — более узкое, частное явление, не обязательно эмпирически подтверждённое, описывающее лишь часть теории.</p>
+<h3 id="lecture-3-4-исторический-кризис-методологии-в-психологии">4. Исторический кризис методологии в психологии</h3>
+<ul>
+<li><strong>Кризис тестирования в СССР.</strong> В 1920–30-е годы психологическое тестирование было официально запрещено (постановление наркомпроса, действовавшее до 1936 года) — из-за критики сегрегации детей по результатам тестов рядом педологов. Тестирование было вновь разрешено только в 1960–70-е годы (статья А. Р. Лурии и А. Н. Леонтьева о необходимости развивать тестирование).</li>
+<li><strong>Отсутствие единой теории личности.</strong> Единая психологическая теория человека до сих пор не создана (об этом писал ещё Л. С. Выготский). Это позволило методологу <strong>Томасу Куну</strong> (автор понятия «парадигма», книга «Структура научных революций») усомниться, можно ли считать психологию наукой в строгом смысле — из-за отсутствия единых базовых убеждений о личности.</li>
+<li>Разные школы выделяют разный «центр» личности: психоанализ — бессознательная мотивация; гуманистическая психология (К. Роджерс, Э. Эриксон) — «я-концепция»/идентичность; деятельностная психология — сознание и деятельность; когнитивная психология (Ж. Пиаже) — интеллект как инструмент адаптации; А. Маслоу — пирамида потребностей.</li>
+</ul>
+<h3 id="lecture-3-5-уровни-методологии-психологического-исследования">5. Уровни методологии психологического исследования</h3>
+<p>Рекомендуемая для магистерской работы <strong>трёхуровневая система по Г. М. Андреевой</strong>:<br />
+1. <strong>Общая методология</strong> — общенаучные и общефилософские принципы (системности, детерминизма, развития), характерные не только для гуманитарных наук, но и для науки в целом.<br />
+2. <strong>Частная методология</strong> — методология конкретной науки (психологии), её школы и подходы (культурологический, деятельностный, гештальт, психоаналитический и т. д.).<br />
+3. <strong>Конкретная методология</strong> — уровень конкретных, узких эмпирических исследований отдельных авторов по конкретной проблеме.</p>
+<p>Альтернативные системы:<br />
+- <strong>По В. А. Ядову</strong>: философский уровень → общая методология → частная методология.<br />
+- <strong>По В. Н. Дружинину</strong>: общий методологический подход → уровень организации исследования (объект, предмет, стратегия) → уровень метода → уровень методик.</p>
+<h3 id="lecture-3-6-естественно-научная-и-гуманитарная-парадигмы">6. Естественно-научная и гуманитарная парадигмы</h3>
+<ul>
+<li><strong>Естественно-научная (позитивная) парадигма</strong> — приоритет объективных стандартизированных измерений (тесты); субъективные методы (опросы, беседы) считаются менее надёжными. Жёсткая стандартизация процедуры. Требования к выборке: как правило, <strong>не менее 60 человек</strong> для статистической значимости (для сравнения нескольких групп — не менее 30 в каждой).</li>
+<li><strong>Гуманитарная парадигма</strong> — приоритет качественным методам; допускает работу с очень маленькими и редкими выборками (2–3 случая), описываемыми детально и качественно (биографический метод). Пример из литературы — психобиографический анализ Эриха Фромма.</li>
+</ul>
+<p>Качественное исследование — не облегчённый вариант работы, а по-своему более сложная и трудоёмкая задача, чем стандартная статистическая обработка.</p>
+<h3 id="lecture-3-7-исторические-типы-методологии-науки">7. Исторические типы методологии науки</h3>
+<h4 id="lecture-3-позитивизм">Позитивизм</h4>
+<p>Связан с именем <strong>Огюста Конта</strong>: единственным подлинно «положительным» знанием он считал экспериментальное, эмпирическое знание.</p>
+<p><strong>Вильгельм Вундт</strong> и его лаборатория (конец 1870-х годов — первая психологическая лаборатория). Из неё вышли: кривые запоминания и забывания <strong>Германа Эббингауза</strong>, закон <strong>Вебера — Фехнера</strong> (связь силы стимула и интенсивности ощущения). Первый тест интеллекта — <strong>шкала Бине — Симона</strong> (1905 год), впоследствии переработанная Льюисом Терменом в Стэнфордскую шкалу.</p>
+<p>Истоки научного метода — у <strong>Декарта, Лейбница, Галилея</strong>. По мере накопления экспериментальных результатов произошла дифференциация научных дисциплин, методология выделилась в отдельную область знания.</p>
+<p>Разделение наук по методу (философия жизни — Ницше, Шпенглер, Бергсон, Виндельбанд):<br />
+- <strong>номотетические науки</strong> — изучают законы природы, построены на количественном, нормативном подходе (все тесты — номотетические методы, они опираются на популяционную норму);<br />
+- <strong>идиографические науки</strong> — описывают уникальные явления духовной, психической, культурной жизни (качественные, часто биографические исследования единичных случаев).</p>
+<p>Пример нормы для теста интеллекта (шкала Векслера): средний интеллект — 100 баллов, стандартное отклонение — около 15, диапазон нормального интеллекта — примерно 70–130 баллов.</p>
+<h4 id="lecture-3-нормальный-закон-распределения">Нормальный закон распределения</h4>
+<p>Колоколообразная («гауссова») кривая: результатов со средним значением признака больше всего, с крайними значениями — меньше всего (около 68% значений — в средней части, ±1 стандартное отклонение).</p>
+<ul>
+<li><strong>Тревожность</strong>: и низкая, и высокая тревожность — крайние, менее эффективные значения признака; наиболее эффективна <strong>средняя тревожность</strong>, обеспечивающая трезвую оценку ситуации.</li>
+<li><strong>Интеллект</strong>: людей с очень низким и очень высоким интеллектом мало (суммарно около 16,8% на обоих полюсах, включая одарённость и умственную отсталость); основная масса — люди со средним интеллектом.</li>
+</ul>
+<h4 id="lecture-3-сциентизм-и-антисциентизм">Сциентизм и антисциентизм</h4>
+<p>Этап позитивизма завершился разделением на: <strong>сциентизм</strong> (наука, особенно физика и математика, — высшая культурная ценность и образец для всех наук) и <strong>антисциентизм</strong> (реакция на технократические провалы и техногенные катастрофы).</p>
+<h4 id="lecture-3-неопозитивизм">Неопозитивизм</h4>
+<p>Связан с именами <strong>Бертрана Рассела</strong> (математическая логика, повлиял на теорию развития интеллекта Ж. Пиаже — стадии сенсомоторного, репрезентативного, конкретно-логического и формально-логического интеллекта у ребёнка) и <strong>Людвига Витгенштейна</strong> (разделение «феноменального» и «объективного» языка). Ключевой критерий научности — принцип <strong>верифицируемости</strong> знания (<strong>Мориц Шлик</strong>): знание должно быть не просто зафиксировано, но и проверено.</p>
+<h4 id="lecture-3-постпозитивизм-с-1960-х-годов">Постпозитивизм (с 1960-х годов)</h4>
+<ul>
+<li><strong>Карл Поппер</strong> — принцип <strong>фальсифицируемости</strong>: критерий научности — не подтверждаемость, а принципиальная опровержимость гипотезы. Опровержение гипотезы — значимый вклад в науку, а не неудача.</li>
+<li><strong>Томас Кун</strong> («Структура научных революций») — понятия <strong>научного сообщества</strong>, <strong>научной парадигмы</strong>, <strong>нормальной науки</strong> (спокойный этап, парадигма принята сообществом) и <strong>экстраординарной науки</strong> (кризис, конкурируют несовместимые подходы). Научная революция — качественная смена парадигмы, а не постепенное накопление знания.</li>
+<li><strong>Имре Лакатос</strong> — концепция <strong>научно-исследовательских программ</strong>: у программы есть «жёсткое ядро» фундаментальных положений и «защитный пояс» вспомогательных гипотез и методологических правил.</li>
+<li><strong>Пол Фейерабенд</strong> — концепция теоретического и методологического плюрализма («методологический анархизм»): наука развивается за счёт сосуществования и конкуренции несовместимых теорий, а не единого метода.</li>
+</ul>
+<h3 id="lecture-3-8-задание-к-следующему-занятию">8. Задание к следующему занятию</h3>
+<p>Подготовить аннотацию на статью <strong>В. Мазилова</strong> (член экспертного совета ВАК, работы 2020 года по методологическим проблемам современной российской психологической науки).</p>
+<blockquote class="warnq">
+<p>⚠️ Готовый ответ на это задание здесь не приводится: сама статья Мазилова не была передана вместе с материалами занятия, а без источника нельзя написать корректную, содержательную аннотацию, не выдумывая её содержание. Как только текст статьи будет доступен — можно будет подготовить аннотацию по ней.</p>
+</blockquote>
+</section>
+<section class="topic-content" id="lecture-4">
+<h2 id="lecture-4-лекция-4-психология-профессиональной-деятельности-и-методы-исследовани">Лекция 4 — «Психология профессиональной деятельности и методы исследования»</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-4-1-предмет-и-задачи-психологии-профессиональной-деятельности">1. Предмет и задачи психологии профессиональной деятельности</a></li>
+<li class="lvl-main"><a href="#lecture-4-2-методы-психологии-профессиональной-деятельности">2. Методы психологии профессиональной деятельности</a></li>
+<li class="lvl-sub"><a href="#lecture-4-профессионально-этические-принципы-работы-психолога">Профессионально-этические принципы работы психолога</a></li>
+<li class="lvl-sub"><a href="#lecture-4-надёжность-и-валидность">Надёжность и валидность</a></li>
+<li class="lvl-sub"><a href="#lecture-4-методы-организации-исследования">Методы организации исследования</a></li>
+<li class="lvl-sub"><a href="#lecture-4-конкретные-методы">Конкретные методы</a></li>
+<li class="lvl-main"><a href="#lecture-4-3-труд-и-профессия-понятия-и-структура">3. Труд и профессия: понятия и структура</a></li>
+<li class="lvl-main"><a href="#lecture-4-4-классификации-профессий">4. Классификации профессий</a></li>
+<li class="lvl-main"><a href="#lecture-4-5-ключевые-термины-пригодность-отбор-подбор-ориентация-профессиография">5. Ключевые термины: пригодность, отбор, подбор, ориентация, профессиография</a></li>
+<li class="lvl-sub"><a href="#lecture-4-схема-составления-профессиограммы-по-е-а-климову-практическая-методика">Схема составления профессиограммы (по Е. А. Климову) — практическая методика</a></li>
+<li class="lvl-main"><a href="#lecture-4-6-практикум-опросник-профессиональных-предпочтений-дж-холланда-riasec">6. Практикум: опросник профессиональных предпочтений Дж. Холланда (RIASEC)</a></li>
+<li class="lvl-main"><a href="#lecture-4-домашнее-задание">Домашнее задание</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 09.09.2026 · <strong>Преподаватель:</strong> Гапонова С.А.<br />
+<strong>Дисциплина:</strong> магистратура, психологическое сопровождение служебной деятельности (силовые структуры)</p>
+<blockquote>
+<p>Это учебный конспект — организационные моменты (баллы, старосты, посещаемость, технические заминки с презентацией) сюда не включены. Полная расшифровка записи (со всеми оргвопросами) хранится в <a href="4_лекция.md">4_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-4-1-предмет-и-задачи-психологии-профессиональной-деятельности">1. Предмет и задачи психологии профессиональной деятельности</h3>
+<p><strong>Деятельность</strong> (по А. Н. Леонтьеву) — направлена на познание и творческое преобразование окружающего мира, включая самого человека и условия его существования. Основные характеристики: мотив, цель, предмет, структура, средства.</p>
+<p><strong>Профессиональная деятельность</strong> — социально значимая деятельность, требующая специальных знаний, умений, навыков и профессионально обусловленных качеств личности; прежде всего деятельность трудовая. <strong>Труд</strong> — целесообразная продуктивная деятельность с определённым результатом.</p>
+<p><strong>Психология профессиональной деятельности (ППД)</strong> — научно-практическая отрасль психологии, изучающая трудовые и профессиональные отношения человека, особенности личности как субъекта профессиональной деятельности и специфику профессиональной деятельности в разных условиях.<br />
+- <strong>Предмет</strong> — трудовые и профессиональные отношения людей, их личностные особенности и способности.<br />
+- <strong>Объект</strong> — сам трудовой процесс (предметы, средства, задачи, цели, условия).</p>
+<p>Тесно связана с психологией труда, экспериментальной психологией, психофизиологией, организационной и инженерной психологией, эргономикой, социальной психологией, психологией управления и развития, юридической и экономической психологией.</p>
+<p><strong>Задачи ППД:</strong><br />
+1. Установление начального уровня профессионализма человека.<br />
+2. Определение соответствия этого уровня требованиям профессии.<br />
+3. Соответствие профессии ожиданиям самого человека.<br />
+4. Раскрытие потенциала личности для овладения профессией.<br />
+5. Выявление условий развития и реализации этого потенциала.</p>
+<h3 id="lecture-4-2-методы-психологии-профессиональной-деятельности">2. Методы психологии профессиональной деятельности</h3>
+<table>
+<thead>
+<tr>
+<th>Группа методов</th>
+<th>Что включает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Эмпирические</td>
+<td>Наблюдение, эксперимент, тесты — сбор информации о людях и их деятельности</td>
+</tr>
+<tr>
+<td>Обработки и систематизации</td>
+<td>Непараметрические (проценты, отчёты) и параметрические/статистические (факторный, дисперсионный, регрессионный анализ)</td>
+</tr>
+<tr>
+<td>Интерпретационные</td>
+<td>Анализ и интерпретация результатов, получение выводного знания</td>
+</tr>
+<tr>
+<td>Практического характера</td>
+<td>Психотерапия, индивидуальное/групповое консультирование, методы активного социально-психологического обучения (тренинги), методы регуляции психических состояний</td>
+</tr>
+<tr>
+<td>Психологического сопровождения</td>
+<td>Изучение, формирование, коррекция в процессе профессионального становления</td>
+</tr>
+<tr>
+<td>Специальные</td>
+<td>Составление профессиограмм, модель рабочего места, метод независимых характеристик, социометрия, референтометрия</td>
+</tr>
+<tr>
+<td>Дискуссионные</td>
+<td>Групповая дискуссия, разбор случаев из практики, анализ ситуаций морального выбора</td>
+</tr>
+<tr>
+<td>Игровые / активного обучения</td>
+<td>Деловые и ролевые игры, круглый стол, мозговой штурм</td>
+</tr>
+</tbody>
+</table>
+<h4 id="lecture-4-профессионально-этические-принципы-работы-психолога">Профессионально-этические принципы работы психолога</h4>
+<ol>
+<li><strong>Соблюдения тайны</strong> — не разглашать результаты без согласия обследуемого.</li>
+<li><strong>Научной обоснованности методики</strong> — методика должна быть надёжной.</li>
+<li><strong>Ненанесения ущерба</strong> — результаты нельзя использовать во вред обследуемому.</li>
+<li><strong>Открытости результатов</strong> — человек должен знать, на что идёт; отказ ему нужно объяснить.</li>
+<li><strong>Объективности выводов</strong> — выводы научно обоснованы, не зависят от субъективных установок исследователя. Сравнивать кандидатов между собой может только заказчик (видит результаты всех, кого сам заказал); сам обследуемый знает только свой результат.</li>
+<li><strong>Объективности рекомендаций</strong> — рекомендации всегда должны быть полезны обследуемому, даже если он не подходит на конкретное место (подсказать другое направление).</li>
+<li><strong>Комплексной диагностики</strong> — сочетать разные методики на одно и то же/родственные свойства для надёжности заключения.</li>
+</ol>
+<h4 id="lecture-4-надёжность-и-валидность">Надёжность и валидность</h4>
+<ul>
+<li><strong>Надёжность</strong> — точность и устойчивость результатов измерения, независимость от случайных факторов (нестабильность состояния испытуемого, качество инструкции — должна быть понятна «на дурака», условия среды, аккуратность экспериментатора). Пример ориентира: число ⚠️ Миллера (в записи — «Меллера»), 7±2 — норма объёма памяти (5–9 баллов).</li>
+<li><strong>Валидность</strong> — соответствие методики измеряемому свойству. Виды: концептуальная (теоретическое обоснование) и содержательная (соответствие заданий измеряемой области). Новую методику проверяют, сравнивая её результаты со старой, проверенной, на одной группе статистическими методами.</li>
+</ul>
+<h4 id="lecture-4-методы-организации-исследования">Методы организации исследования</h4>
+<ul>
+<li><strong>Сравнительно-генетический (лонгитюдный)</strong> — одно и то же свойство изучается у одних и тех же испытуемых на протяжении длительного времени (пример: ассертивное поведение студентов с 1-го по 4-й курс; память у школьников в 1, 4, 8, 10 классах).</li>
+<li><strong>Сравнительный (метод поперечных срезов)</strong> — одновременное сравнение разных групп (пример: мышление математиков — абстрактно-логическое — и филологов — наглядно-действенное/художественное; внимание и память у мальчиков и девочек в начальной школе — девочки поначалу опережают, к 3–4 классу мальчики догоняют).</li>
+</ul>
+<h4 id="lecture-4-конкретные-методы">Конкретные методы</h4>
+<ul>
+<li><strong>Наблюдение</strong> — исторически восходит к интроспекции (самонаблюдению). Виды: систематическое/случайное; скрытое (через ⚠️ зеркало Гезелла — в записи «стекло Бизела») / открытое; включённое (наблюдатель — сам член группы, открыто или скрыто) / невключённое. Обязательна фиксация результатов (видео, фото, дневник).</li>
+<li><strong>Архивный анализ</strong> — дневники, журналы, кинофильмы, статьи, предсмертные записки; основной метод исторической психологии.</li>
+<li><strong>Эксперимент</strong>:</li>
+<li><strong>лабораторный</strong> — с аппаратурой (ЭЭГ, кардиограмма, кожно-гальваническая реакция — основа детектора лжи), строгий контроль условий;</li>
+<li><strong>естественный</strong> — сохраняет обычные условия деятельности. Впервые проведён ⚠️ Лазурским (в записи — «Анатолий Александрович», в литературе — Александр Фёдорович Лазурский) в 1910 году в гимназии: классу, которому обещали спросить материал через неделю, а спросили — как и второму классу — через две недели, запомнил материал лучше, чем классу, которому обещали спросить через два дня.</li>
+<li><strong>Анкетирование</strong> — открытые / закрытые / смешанные анкеты. Закрытые легче обрабатывать статистически, но есть риск социальной желательности (для этого в части методик есть шкалы лжи).</li>
+<li><strong>Интервью (беседа)</strong> — свободное / стандартизованное (близко к закрытой анкете).</li>
+<li><strong>Тестирование</strong> — стандартизованные задания с определённой шкалой значений. Виды тестов:</li>
+<li><strong>личности</strong> (характер, способности, эмоции, познавательные процессы);</li>
+<li><strong>достижений</strong> (уровень знаний/умений/навыков — часто применяются в профотборе);</li>
+<li><strong>способностей</strong> (общие и специальные способности);</li>
+<li><strong>интеллекта</strong> (тип мышления, память, внимание — появились в конце XIX века с тестами Бине; пример из практики лектора: у студентов-математиков и филологов одинаковый средний балл интеллекта по тесту Айзенка, ~130, но задачи решаются по-разному — математически vs словесно-логически);</li>
+<li><strong>креативности</strong> (готовность к нестандартным решениям, переключение видов мышления — у детей выше, чем у взрослых, из-за отсутствия закреплённых «алгоритмов мышления»);</li>
+<li><strong>проективные</strong> (рисуночные, цветовые и др. — особенно эффективны с детьми; на занятии разбирались тесты «Рисунок семьи» и «Несуществующее животное» — по одному такому тесту решение о профпригодности не принимается, нужна батарея методик на разные качества).</li>
+</ul>
+<h3 id="lecture-4-3-труд-и-профессия-понятия-и-структура">3. Труд и профессия: понятия и структура</h3>
+<p><strong>Труд</strong> — целенаправленная, орудийная, общественная деятельность, материализующаяся в предмете труда и одновременно меняющая самого человека.</p>
+<p><strong>Профессия</strong> (от лат. <em>professio</em> — публичное объявление рода занятий) отличается от смежных понятий:<br />
+- <strong>специальность</strong> — конкретный вид деятельности в рамках профессии (врач → терапевт/хирург/онколог; слесарь → сантехник/электрослесарь);<br />
+- <strong>должность</strong> — конкретное трудовое место в организации (одни должности требуют строго определённой профессии, другие — доступны представителям разных профессий);<br />
+- <strong>хобби</strong> — не профессия, так как не служит источником средств существования.</p>
+<p>Признаки профессии: требует специальной подготовки и обучения; практикуется регулярно (а не эпизодически); служит источником средств существования.</p>
+<p><strong>Структура профессии:</strong><br />
+- <strong>Цели труда</strong>: гностические (исследовать, распознавать, оценивать — критик, эксперт, следователь, врач, психолог), преобразующие (обучать, лечить, чинить — инженер-теплотехник, библиотекарь, адвокат, слесарь), изыскательские (изобрести, сконструировать — композитор, дизайнер, модельер).<br />
+- <strong>Предмет труда</strong> — различные системы (социальные, знаковые, художественные, эстетические).<br />
+- <strong>Средства труда</strong> — ручной труд / автоматизированные системы; обычный микроклимат / открытый воздух / необычные условия (под землёй, под водой, в космосе); труд с повышенной моральной ответственностью и труд в экстремальных ситуациях.<br />
+- Также: система служебных обязанностей и прав; производственная среда (предметные и социальные условия труда).</p>
+<p><strong>Формула профессии психолога</strong> (разобрана на занятии как образец):<br />
+- предмет труда — человек;<br />
+- условия труда — любые (по месту работы), но прежде всего повышенная моральная ответственность;<br />
+- средства труда — функциональные: мышление, интеллект, язык, жесты, мимика;<br />
+- цели труда — прежде всего гностические, а также преобразующие и изыскательские.</p>
+<h3 id="lecture-4-4-классификации-профессий">4. Классификации профессий</h3>
+<p><strong>По объекту труда (Е. А. Климов)</strong> — пять типов:</p>
+<table>
+<thead>
+<tr>
+<th>Тип</th>
+<th>Примеры профессий</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Человек — природа</td>
+<td>агроном, биолог, зоолог, дизайнер парков</td>
+</tr>
+<tr>
+<td>Человек — техника</td>
+<td>инженеры, строители, сантехники</td>
+</tr>
+<tr>
+<td>Человек — человек</td>
+<td>психолог, педагог, врач</td>
+</tr>
+<tr>
+<td>Человек — знаковая система</td>
+<td>IT-специалисты, лингвисты, математики</td>
+</tr>
+<tr>
+<td>Человек — художественный образ</td>
+<td>литераторы, художники, музыканты, дизайнеры</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Соотнесение с целями труда</strong> (примеры по каждой ячейке): гностические — наладчик станков с ЧПУ, архивариус, литературный критик, психолог; преобразующие — ветеринар, водитель-испытатель, актёр, учитель/врач; изыскательские — биоинженер, изобретатель-инженер, программист, художник-дизайнер, режиссёр. Классификация условна — многие профессии совмещают несколько функций.</p>
+<p><strong>По требованиям к природным данным:</strong><br />
+- <strong>абсолютная профпригодность</strong> — компенсировать нехватку данных почти невозможно (лётчик, космонавт, музыкант, художник, писатель);<br />
+- <strong>относительная профпригодность</strong> — недостающие качества компенсируются мотивацией и опытом; сюда относится большинство профессий, включая психолога (у профессии много вариантов реализации — консультирование, преподавание, наука, психотерапия — и каждый находит свой).</p>
+<h3 id="lecture-4-5-ключевые-термины-пригодность-отбор-подбор-ориентация-профессиография">5. Ключевые термины: пригодность, отбор, подбор, ориентация, профессиография</h3>
+<ul>
+<li><strong>Профессиональная пригодность</strong> — совокупность психологических и психофизиологических особенностей человека, необходимых и достаточных для достижения общественно приемлемой эффективности труда (при наличии знаний и навыков) + удовлетворённость человека процессом и результатом труда.</li>
+<li><strong>Профессиональный отбор</strong> — определение соответствия человека профессии и отсеивание непригодных кандидатов из группы претендентов на вакансию.</li>
+<li><strong>Профессиональный подбор</strong> — распределение работников по специальностям/местам работы: каждому конкретному человеку подбирают профессию/место, где он будет наиболее эффективен (промежуточная форма между отбором и ориентацией).</li>
+<li><strong>Профессиональная ориентация</strong> — вид профконсультации; на этапе выбора профессии показывает человеку, какая профессия ему подходит (пример: тестирование школьников по методике Климова).</li>
+<li><strong>Профессиография</strong> — научное исследование и описание профессии с точки зрения предъявляемых человеку требований. Результат — <strong>профессиограмма</strong> (документ с характеристикой профессии для отбора, обучения, ориентации, построения карьеры), важная часть которой — <strong>психограмма</strong> (характеристика мотивационной, волевой и эмоциональной сферы специалиста).</li>
+</ul>
+<h4 id="lecture-4-схема-составления-профессиограммы-по-е-а-климову-практическая-методика">Схема составления профессиограммы (по Е. А. Климову) — практическая методика</h4>
+<p>При описании конкретной профессии учитываются:<br />
+1. <strong>Цель труда</strong> (см. классификацию целей выше).<br />
+2. <strong>Орудия и средства труда</strong> — внешние (ручные инструменты) и внутренние/функциональные (речь — эмоционально-выразительная или деловая/безэмоциональная; мимика, жесты; интеллектуальные средства мышления).<br />
+3. <strong>Степень проблемности ситуаций</strong> — низкая (работа чётко по инструкциям) / средняя (иногда нужны нестандартные решения) / высокая (часто новые, сложные ситуации, нужна творческая активность).<br />
+4. <strong>Социально-психологические параметры</strong> — степень коллективности труда (индивидуальный/коллективный); степень самостоятельности (исполнитель / организатор своей деятельности / организатор работы других); особенности взаимодействия — по числу контактов, по типу партнёров (посетители, клиенты, сотрудники, группа, класс, аудитория), по постоянству круга партнёров.<br />
+5. <strong>Эмоциональные параметры</strong> — характер ответственности (повышенная материальная/моральная за жизнь и здоровье людей, или средняя/обычная); условия работы (помещение / открытый воздух / необычные условия); факторы психической напряжённости (риск для жизни, дефицит времени, общение с правонарушителями, напряжённый темп работы, физические нагрузки, длительное пребывание в одном положении, ночные смены, температура/влажность/шум/вибрация).</p>
+<h3 id="lecture-4-6-практикум-опросник-профессиональных-предпочтений-дж-холланда-riasec">6. Практикум: опросник профессиональных предпочтений Дж. Холланда (RIASEC)</h3>
+<p>На занятии студенты прошли опросник профессиональных предпочтений: в каждой из 10 пар предложенных профессий (например, «автомеханик — физиотерапевт») нужно выбрать более привлекательную и отметить «+» в соответствующей буквенной строке бланка. Затем подсчитывается число плюсов по каждой из шести шкал (максимум 10 на шкалу):</p>
+<table>
+<thead>
+<tr>
+<th>Баллы</th>
+<th>Выраженность типа</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8–10</td>
+<td>ярко выраженный тип</td>
+</tr>
+<tr>
+<td>5–7</td>
+<td>средне выраженный</td>
+</tr>
+<tr>
+<td>2–4</td>
+<td>слабо выраженный</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ В сырой записи буквы шкал переданы ASR нестабильно (R, V, S, O, P, A); по содержанию инструкции методика соответствует классическому опроснику Холланда RIASEC: <strong>R</strong> — реалистический, <strong>I</strong> — интеллектуальный/исследовательский, <strong>A</strong> — артистический, <strong>S</strong> — социальный, <strong>E</strong> — предприимчивый, <strong>C</strong> — конвенциональный («офисный» в изложении преподавателя).</p>
+<p>Каждый тип на шестиугольнике методики имеет «близкие» и «противоположные» типы (например, предпринимательский и офисный/конвенциональный — противоположны; на занятии это подтвердилось на реальных результатах студентов — высокий предпринимательский почти всегда сочетался с нулевым офисным). Методика измеряет именно <strong>предпочтения/интересы</strong>, а не имеющиеся навыки, хотя они часто совпадают. Высокий балл по типу, не совпадающему с текущей профессией, может отражать нереализованное увлечение или мечту, а не то, чем человек фактически занимается.</p>
+<p>По итогам каждый участник формулирует про себя короткий письменный вывод, опираясь на приведённую в методике трактовку своего типа (или сочетания типов).</p>
+<h3 id="lecture-4-домашнее-задание">Домашнее задание</h3>
+<p>Отдельного домашнего задания на дом преподаватель не давала — вся практическая работа этого занятия (заполнение и разбор опросника профессиональных предпочтений, письменный вывод по своим результатам) целиком выполнялась и сдавалась старостам в рамках самого занятия, срок пересылки итоговых цифр и выводов — до понедельника после занятия. Внешнего задания, требующего отдельного ответа, для этой лекции нет.</p>
+</section>
+<section class="topic-content" id="lecture-5">
+<h2 id="lecture-5-лекция-5-проектирование-и-практика-проведения-тренинга-в-организации-п">Лекция 5 — «Проектирование и практика проведения тренинга в организации» (продолжение)</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-5-1-модели-взаимодействия-психологклиент">1. Модели взаимодействия психолог–клиент</a></li>
+<li class="lvl-main"><a href="#lecture-5-2-спасательство-и-помогательство">2. Спасательство и помогательство</a></li>
+<li class="lvl-main"><a href="#lecture-5-3-направления-и-подходы-в-групповой-работе-продолжение-обзора">3. Направления и подходы в групповой работе — продолжение обзора</a></li>
+<li class="lvl-main"><a href="#lecture-5-4-наблюдение-тренера-за-группой">4. Наблюдение тренера за группой</a></li>
+<li class="lvl-main"><a href="#lecture-5-5-архитектура-и-архитектоника-тренинга">5. Архитектура и архитектоника тренинга</a></li>
+<li class="lvl-main"><a href="#lecture-5-6-как-формулировать-целевую-аудиторию-цель-и-задачи-тренинга-практикум">6. Как формулировать целевую аудиторию, цель и задачи тренинга — практикум</a></li>
+<li class="lvl-main"><a href="#lecture-5-7-домашнее-задание">7. Домашнее задание</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 10.09.2026 · <strong>Преподаватель:</strong> Минаева Е.В., канд. психол. наук, доцент, клинический психолог<br />
+<strong>Дисциплина:</strong> магистратура, психологическое сопровождение служебной деятельности (силовые структуры)</p>
+<blockquote>
+<p>Это учебный конспект — организационные моменты, перекличка, техническая часть, обсуждение тем магистерских диссертаций и итоговое анкетирование участников по занятию сюда не включены. Полная расшифровка записи хранится в <a href="5_лекция.md">5_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-5-1-модели-взаимодействия-психологклиент">1. Модели взаимодействия психолог–клиент</h3>
+<p>В консультативном/терапевтическом процессе традиционно выделяют три модели взаимодействия:</p>
+<table>
+<thead>
+<tr>
+<th>Модель</th>
+<th>Логика</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Медицинская</strong> («врач–больной»)</td>
+<td>Строго авторитарная: врач говорит, пациент выполняет, не споря</td>
+<td>«Вас капают, колют, мажут» — мнение пациента не учитывается</td>
+</tr>
+<tr>
+<td><strong>Педагогическая</strong> («учитель учит»)</td>
+<td>Тоже авторитарная, но исходит из потребностей обучаемого; посылка — «ученик не умеет»</td>
+<td>Задача учителя — дать то, чего у ученика нет</td>
+</tr>
+<tr>
+<td><strong>Психотерапевтическая — «позиция на равных»</strong></td>
+<td>Идеальная модель: никто ни у кого не «вытягивает» запрос, ответственность распределена поровну</td>
+<td>Психолог не даёт советов и не решает за клиента, «где ему будет лучше» — это знает сам клиент</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Позиция на равных</strong> не означает равенства знаний или жизненного опыта (в диалоге разбирался пример с ребёнком 5–7 лет — равенства «по бэкграунду» с ним быть не может). Она означает <strong>взаимный учёт потребностей</strong>: психолог/педагог полностью выслушивает то, что важно ребёнку или подростку, не спорит и не отрицает его позицию, но и не поступается своими профессиональными задачами, договариваясь о взаимном уважении.</p>
+<p>Психолог, занимающий позицию на равных, тем самым сам становится <strong>моделью здоровых отношений</strong> для клиента — «то, что выстраивается между вами, должно быть примером тёплых, ровных, честных отношений человека с миром». Конкретные школы/направления психотерапии в этом смысле вторичны — это лишь «язык», инструмент; сама позиция важнее выбранного метода.</p>
+<p>Отдельно разобран пример: занятия, построенные по принципу «развлеки меня» (психолог как «аниматор») — с точки зрения Е.В., это не психотерапия, а форма досуга, даже если её ведёт дипломированный психолог.</p>
+<h3 id="lecture-5-2-спасательство-и-помогательство">2. Спасательство и помогательство</h3>
+<ul>
+<li><strong>Помогатель</strong> — не несёт ответственности за жизнь клиента (это ответственность самого клиента); может «развернуть реальность» и показать её с другой стороны, предложить вместе подумать, но решение и конечная цель остаются за клиентом.</li>
+<li><strong>Спасатель</strong> — тянет клиента к результату, даже если тот сам к нему ещё «не дорос». Это неэффективно (результат должен «подлиться сам») и небезопасно для клиента: в транзактном анализе спасательство закрепляет за клиентом роль «жертвы», хотя клиент приходит именно для того, чтобы стать взрослым.</li>
+<li>Критерий разграничения — <strong>наличие явного запроса</strong>. Если человек прямо просит о конкретной помощи — это помощь. Если человек просто пожаловался, что всё плохо, а вы тут же бросились «спасать» без запроса — это спасательство.</li>
+<li>Исключение, о котором стоит honestly помнить: при действительно тяжёлых состояниях (например, глубокая депрессия) клиент сам может никогда не дойти до психолога — тогда вмешательство близких (вплоть до «привести за руку») бывает оправданным и жизненно необходимым. Общего правила «спасательство — всегда плохо» нет, важен индивидуальный взгляд на конкретного клиента.</li>
+<li>Склонность к спасательству — частая личная особенность людей, выбирающих профессию психолога, и типичная мишень их собственной личной терапии.</li>
+</ul>
+<h3 id="lecture-5-3-направления-и-подходы-в-групповой-работе-продолжение-обзора">3. Направления и подходы в групповой работе — продолжение обзора</h3>
+<table>
+<thead>
+<tr>
+<th>Подход</th>
+<th>Ключевая идея</th>
+<th>Основные понятия / техники</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Телесно-ориентированная терапия (ТОП)</strong></td>
+<td>Тело и психика едины; психологическая проблема отражается в теле «зажимом»</td>
+<td>Работа через тело → снятие зажима → восстановление внутренней гармонии</td>
+</tr>
+<tr>
+<td><strong>Транзактный анализ (Э. Берн)</strong></td>
+<td>Человек постоянно переключается между тремя ролями</td>
+<td>Родитель — Взрослый — Ребёнок; анализ транзакций, анализ «игр»; цель — укрепление внутреннего Взрослого</td>
+</tr>
+<tr>
+<td><strong>Гештальт-подход</strong></td>
+<td>Незавершённая ситуация («незакрытый гештальт») оттягивает энергию</td>
+<td>Фигура, фон, контакт; цикл контакта: интерес → возбуждение → полный контакт → удовлетворение потребности → смена фигуры; незакрытый гештальт → навязчивые мысли, злость, обида</td>
+</tr>
+<tr>
+<td><strong>Группаналитический подход (групповой психоанализ)</strong></td>
+<td>Инструмент — сама группа; ведущий не задаёт тему</td>
+<td>Матрица (система невидимых связей между участниками), перенос/контрперенос, эффект зеркала; тренер направляет точечными вопросами, возвращая реакцию конкретному участнику</td>
+</tr>
+<tr>
+<td><strong>НЛП</strong></td>
+<td>Поведение и самочувствие определяются «программой» из образов, слов, убеждений</td>
+<td>Якорение (привязка состояния к жесту/слову); визуально-кинестетическая диссоциация — работа с фобией через мысленный чёрно-белый «немой повтор» ситуации со стороны</td>
+</tr>
+</tbody>
+</table>
+<p>Метафора Е.В. для всех направлений сразу: «в лесу родилась ёлочка — каждое направление будет петь одну и ту же общую задачу по-своему, со своего места».</p>
+<h3 id="lecture-5-4-наблюдение-тренера-за-группой">4. Наблюдение тренера за группой</h3>
+<p>Ведение группового тренинга сложнее индивидуальной терапии — внимание приходится рассредоточивать сразу на многих участников. Четыре параметра, за которыми должен следить тренер:</p>
+<ol>
+<li><strong>Точки отсчёта</strong> — исходный уровень участников, от которого начинается движение к росту.</li>
+<li><strong>Динамика развития группы.</strong></li>
+<li><strong>Стадия развития тренинга</strong>, на которой сейчас находится группа.</li>
+<li><strong>Зоны ближайшего развития / мишени каждого участника</strong> — после первого дня тренер должен понимать, кто перед ним и на что конкретно предстоит воздействовать.</li>
+</ol>
+<p>Частая ошибка начинающего тренера — из-за тревоги концентрироваться на себе («правильно ли я делаю») вместо участников. Совет: мозг не может интенсивно думать о двух вещах одновременно — полное переключение внимания на участников снижает собственную тревогу и делает работу более «экологичной». Супервизора стоит просить оценивать именно то, что важно вам самим, а не то, что он сам сочтёт нужным.</p>
+<h3 id="lecture-5-5-архитектура-и-архитектоника-тренинга">5. Архитектура и архитектоника тренинга</h3>
+<p><strong>Термины.</strong> Архитектура — общее строение тренинга (проект действий на занятиях). Архитектоника — соразмерность частей (по смыслу, времени, последовательности тем).</p>
+<p><strong>С чего начинается разработка:</strong> цель + целевая группа — важнейшие категории, от них зависит и строение тренинга, и подбор упражнений. Формулировка цели — точная и позитивная (без частицы «не»): к чему участник должен прийти, а не от чего «убежать». Слишком широкая цель → ошибочное, «растекающееся» построение тренинга.</p>
+<p><strong>Временные границы:</strong><br />
+- Взрослые участники выдерживают порядка 3 часов работы с перерывом через 1,5–2 часа; тренированные психологи — 6–8 часов.<br />
+- Мотивированные участники способны организованно посещать тренинг раз в неделю на протяжении 3–4 месяцев. Если заранее не обозначено точное число занятий — эффективность посещаемости падает.</p>
+<p><strong>Законы эффективности тренинга:</strong><br />
+- закон Паркинсона — объём работы заполняет всё отведённое на неё время (одну и ту же тему можно раскрыть и коротко, и очень подробно);<br />
+- закон смены картины мира — меняется в течение как минимум полугода (по личной оценке лектора — дольше);<br />
+- закон «волшебного пинка» — тренинг сам по себе не есть развитие, а лишь даёт толчок к нему; насколько человек продвинется дальше — зависит от него самого;<br />
+- закон тройного прикосновения — мысль становится «своей» только после того, как входит в сознание не менее трёх раз, лучше — в разных упражнениях и, возможно, в разные дни.</p>
+<p><strong>«Неэффективное время»</strong>, которое нужно закладывать отдельно от времени на упражнения: ориентация/адаптация в начале (~5 мин), перерыв (15–20 мин — короче 15 мин непродуктивно), ещё ~5 мин на «сборку» после перерыва, стретч-брейки (10–15 мин — ситуативно, при конфликтах/напряжении в группе), время на незапланированные, но важные отвлечения от темы.</p>
+<p><strong>Насыщенность и структура занятия.</strong> Частая ошибка (особенно у новичков) — перенасыщение занятия упражнениями, что ведёт к усталости и снижению эффективности. Рекомендуемая структура одного занятия: 1–2 (реже 3) разминочных упражнения → 1–2 целевых упражнения → завершающее упражнение с обязательным обсуждением. Цикл — ориентировочно 5–7 занятий. Структура занятия целиком: вступительная часть → основная часть (упражнения + обсуждение) → заключительная часть (итоги, план самостоятельной работы).</p>
+<p><strong>Подбор и описание упражнений.</strong> Упражнения подбираются под цель, целевую аудиторию и закон тройного прикосновения, с учётом уровня подготовленности участников; заранее продумываются возможные побочные эффекты и их нейтрализация. Описание каждого упражнения: цель, инструкция, время, пояснения (в том числе стимульный материал), возможные модификации.</p>
+<p><strong>Мониторинг эффективности.</strong> Тренинг стоит предварительно «прогнать» — с коллегами, по возможности с супервизором (открыто представленным или «играющим» инкогнито в группе). Обратная связь — через анкету по 10-балльной шкале (количественную, количественно-качественную или в форме свободного отзыва). Гнаться за 9–10 баллами не нужно — угодить всем невозможно; результат 7–8 баллов — очень хороший показатель, результат ниже 5–6 баллов — сигнал тревоги, повод пересмотреть тренинг.</p>
+<h3 id="lecture-5-6-как-формулировать-целевую-аудиторию-цель-и-задачи-тренинга-практикум">6. Как формулировать целевую аудиторию, цель и задачи тренинга — практикум</h3>
+<p>Главный методический урок занятия (разобран на живом примере студенческих презентаций): формулировки вроде «сплочённость», «взаимопомощь», «доверие» сами по себе <strong>не измеримы</strong> и потому недостаточны для профессиональной постановки задачи. Психология как наука в первую очередь опирается на <strong>наблюдение и эксперимент</strong> — методы с максимально широким охватом и максимальной объективностью; тесты и анкеты — вспомогательные методы, удобные на практике за счёт скорости и экономичности, но менее строгие.</p>
+<p>Правильный алгоритм: за общим словом-ценностью нужно найти <strong>конкретный, отслеживаемый показатель</strong>, который стоит за реальным запросом заказчика или самой целевой аудитории. Примеры из занятия:</p>
+<ul>
+<li>Запрос «нужна сплочённость в коллективе» → конкретизация: «сотрудники подолгу перепроверяют работу друг друга, не доверяя» → измеримая цель: <strong>сократить время (скорость) взаимодействия между сотрудниками при решении общих задач</strong>.</li>
+<li>KPI (ключевой показатель эффективности) — пример готового измеримого инструмента, уже применяемого в организациях: складывается из набора конкретных параметров, а не абстрактных понятий.</li>
+</ul>
+<p>Общая логика формулировки: «А, Б, С заложили в начале — А, Б, С получили в конце» — конкретность делает работу психолога понятной и убедительной для заказчика.</p>
+<h3 id="lecture-5-7-домашнее-задание">7. Домашнее задание</h3>
+<p><strong>Формулировка задания (три пункта):</strong><br />
+1. Понаблюдать за собой в позиции «на равных» во взаимодействии с другими — но не через самонаблюдение в моменте, а через наблюдение за <em>другими</em> людьми — и попытаться выделить критерии, которые помогают человеку оставаться в равной позиции.<br />
+2. Выполнить одно практическое задание из электронного курса (Moodle, раздел «Практика» по теме этого занятия) — на выбор, не все задания обязательны.<br />
+3. По желанию — разработать для себя целевую аудиторию, цель и задачи собственного будущего тренинга (того самого, который в перспективе войдёт в магистерскую диссертацию).</p>
+<p><strong>Честно о том, что можно и нельзя ответить здесь.</strong> Пункты 2 и 3 принципиально персональные и завязаны на материалы, которых нет в этом архиве: конкретный текст практического задания лежит в личном кабинете Moodle (это отдельная, специфичная для темы «позиция на равных» практика, содержание которой преподаватель на занятии не зачитывала целиком), а пункт 3 явно привязан к теме собственной магистерской диссертации каждого студента — она ещё не выбрана окончательно даже у части присутствовавших на занятии (см. полную расшифровку, раздел 13). Придумывать содержание несуществующего у нас источника или чужую тему диссертации я не буду — это противоречило бы задаче честно опираться только на реальные материалы.</p>
+<p><strong>Что можно сделать по существу — пункт 1 (критерии позиции «на равных»).</strong> Вот рабочий список критериев, собранный из разборов и примеров именно этого занятия — с ним можно сверяться при наблюдении за собой и другими:</p>
+<ul>
+<li><strong>Наличие явного запроса.</strong> Позиция «на равных» начинается с того, что вы (или ваш собеседник) чётко формулируете, чего именно хотите от взаимодействия — не «оцени меня в целом», а «мне нужна обратная связь именно по этому конкретному вопросу». Расплывчатый запрос почти автоматически ставит вас в позицию «снизу».</li>
+<li><strong>Ответственность 50/50, а не 100/0.</strong> Ни одна из сторон не решает за другую, «как правильно» и «что нужно сделать» — обе стороны одинаково включены в процесс и одинаково отвечают за результат.</li>
+<li><strong>Учёт потребностей друг друга, а не равенство знаний/опыта.</strong> Позиция на равных возможна даже при явном разрыве в опыте (пример из занятия — ребёнок 5–7 лет, или начинающий психолог и супервизор): важно не формальное равенство, а то, что обе стороны учитывают потребности друг друга.</li>
+<li><strong>Отсутствие директивных советов «сверху».</strong> Формула «сделай так и будет тебе счастье» — это позиция «сверху» (педагогическая/медицинская модель), а не «на равных». Вместо этого — совместное рассуждение: «вот проблема, давай подумаем, как её решить».</li>
+<li><strong>Понимание реальной структуры зависимости.</strong> Разбор на занятии показал: на первый взгляд авторитетная фигура (супервизор, эксперт) объективно может занимать <em>более</em> зависимую позицию, чем кажется (супервизора выбирает и приглашает сам тренер, а не наоборот) — прежде чем занимать позицию «снизу» по умолчанию, стоит проверить, кто на самом деле кого выбрал/пригласил.</li>
+<li><strong>Уважение к собственной позиции наравне с позицией другого.</strong> С подростком или сложным клиентом «на равных» не значит соглашаться со всем, что он говорит — значит выслушать, не отрицая его точку зрения, но и не поступаясь своей, договорившись о взаимном уважении.</li>
+</ul>
+<p>Если для пункта 3 нужен пример того, <em>как</em> формулировать целевую аудиторию/цель/задачи (даже без своей темы), см. раздел 6 выше — там разобран рабочий алгоритм «от абстрактной ценности к измеримому критерию» на примерах двух учебных тренингов, которые разбирались прямо на занятии (для беспилотных войск и для профилактики выгорания сотрудников МВД, оба — см. полную расшифровку, разделы 16–17).</p>
+<hr />
+<p><em>⚠️ Отдельные неточности распознавания и расхождения между устным изложением и слайдовой версией того же материала (например, время на ориентацию/адаптацию — устно прозвучало «~5 минут», в презентации к лекции 1 было «~20 минут»; временные границы — устно «3 часа», в презентации «3–4 часа») подробно отмечены и не сглажены в полной расшифровке (<a href="5_лекция.md">5_лекция.md</a>, раздел 8) — здесь для читаемости конспекта они не дублируются.</em></p>
+</section>
+<section class="topic-content" id="lecture-6">
+<h2 id="lecture-6-лекция-6-основы-психологии-история-становления-психологии-как-науки">Лекция 6 — «Основы психологии»: история становления психологии как науки</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-6-1-психология-как-наука-определение-происхождение-термина">1. Психология как наука: определение, происхождение термина</a></li>
+<li class="lvl-main"><a href="#lecture-6-2-предмет-задачи-и-методы-психологии">2. Предмет, задачи и методы психологии</a></li>
+<li class="lvl-main"><a href="#lecture-6-3-история-становления-психологии-как-науки">3. История становления психологии как науки</a></li>
+<li class="lvl-sub"><a href="#lecture-6-31-античность-три-вектора-понимания-психики">3.1. Античность — три вектора понимания психики</a></li>
+<li class="lvl-sub"><a href="#lecture-6-32-философия-нового-времени-и-естественно-научный-этап">3.2. Философия Нового времени и естественно-научный этап</a></li>
+<li class="lvl-sub"><a href="#lecture-6-33-вклад-философии-в-психологию">3.3. Вклад философии в психологию</a></li>
+<li class="lvl-sub"><a href="#lecture-6-34-научные-школы-xx-века">3.4. Научные школы XX века</a></li>
+<li class="lvl-sub"><a href="#lecture-6-35-отечественная-психология">3.5. Отечественная психология</a></li>
+<li class="lvl-sub"><a href="#lecture-6-36-психология-в-системе-наук-о-человеке">3.6. Психология в системе наук о человеке</a></li>
+<li class="lvl-main"><a href="#lecture-6-4-домашнее-задание-понятие-психики-и-сознания-к-18092026">4. Домашнее задание: «Понятие психики и сознания» (к 18.09.2026)</a></li>
+<li class="lvl-sub"><a href="#lecture-6-задание">Задание</a></li>
+<li class="lvl-sub"><a href="#lecture-6-ответ">Ответ</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 11.09.2026 · <strong>Преподаватель:</strong> Серебрякова Т. А.<br />
+<strong>Дисциплина:</strong> магистратура, психологическое сопровождение служебной деятельности (силовые структуры); курс «Основы психологии»</p>
+<blockquote class="warnq">
+<p>Это учебный конспект — организационные моменты (распределение по научным руководителям, требования к публикациям, расписание пар) сюда не включены. Полная расшифровка записи хранится в <a href="6_лекция.md">6_лекция.md</a> в этой же папке.</p>
+<p>⚠️ Один из четырёх исходных видеофайлов (<code>2.mp4</code>) по содержанию не относится к этому занятию — это лекция по курсу «Психология развития», который, по словам самой преподавательницы, на 11.09.2026 ещё не начинался. <strong>Установлено:</strong> это начало лекции 8 (Серебрякова Т. А., 12.09.2026, «Психология развития») — файл был по ошибке выложен на Яндекс.Диске не в ту дату, перенесён в папку <code>8_лекция.12.09.26/</code> и включён в архив 8-й лекции как её первая часть. Подробное обоснование — в предупреждении в начале <code>6_лекция.md</code>. В этом конспекте (по теме «Основы психологии») его материал по-прежнему не используется.</p>
+<p>Сопутствующих материалов (презентаций, документов) к этому занятию не найдено — в исходной папке были только видеозаписи.</p>
+</blockquote>
+<h3 id="lecture-6-1-психология-как-наука-определение-происхождение-термина">1. Психология как наука: определение, происхождение термина</h3>
+<p><strong>Психология</strong> — наука, изучающая поведение человека, его мысли, чувства, желания («психический склад человека»); также — наука, изучающая психику и закономерности её проявления и развития.</p>
+<ul>
+<li>Психическими явлениями мыслители заинтересовались ещё в глубокой древности. Классическое определение, приводимое в любом учебнике: <strong>«психология — наука о душе»</strong> — восходит к трактату Аристотеля «О душе» (преподаватель датировала его VI веком до н. э.; ⚠️ фактически это IV век до н. э. — Аристотель жил в 384–322 гг. до н. э.).</li>
+<li>Термин «психология» — древнегреческого происхождения, связан с мифом о <strong>Психее</strong>: отсюда трактовка психологии как науки о познании человеком не только окружающего мира, но и себя в этом мире.</li>
+</ul>
+<p><strong>Разделы психологии:</strong> основы и история психологии; психология познавательных процессов (от ощущений и восприятия до мышления, речи, памяти, сознания); психология личности (темперамент, характер, воля, мотивация, направленность); психология деятельности (игровая, учебная, трудовая, деятельность общения).</p>
+<h3 id="lecture-6-2-предмет-задачи-и-методы-психологии">2. Предмет, задачи и методы психологии</h3>
+<p><strong>Предмет</strong> психологии — конкретные факты и проявления психики (в том числе у животных — отсюда значение зоопсихологии для становления психологии человека), личностные изменения, деятельность, общение, отношения в группах — как внутреннее психическое, так и внешнее поведенческое, как в индивидуальных, так и в групповых проявлениях.</p>
+<p><strong>Основная задача</strong> — изучение законов психической деятельности и её развития (теоретическая задача), раскрывающаяся через множество прикладных практических задач.</p>
+<p><strong>Методы психологии</strong> — четыре группы:</p>
+<table>
+<thead>
+<tr>
+<th>Группа методов</th>
+<th>Примеры</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Организационные</strong></td>
+<td>сравнительный (сравнительно-генетический), лонгитюдный, метод поперечных срезов</td>
+</tr>
+<tr>
+<td><strong>Эмпирические (исследовательские)</strong></td>
+<td>наблюдение и самонаблюдение (интроспекция), эксперимент (лабораторный/естественный/формирующий), психодиагностические методы (тесты, анкеты, интервью, беседа), анализ продуктов деятельности, биографический метод</td>
+</tr>
+<tr>
+<td><strong>Обработки данных</strong></td>
+<td>количественные (методы математической статистики — обязательны даже в простейшей ВКР) и качественные (содержательное описание и интерпретация)</td>
+</tr>
+<tr>
+<td><strong>Коррекции / развивающего воздействия</strong></td>
+<td>аутотренинг, телесно-медитативные практики, групповой тренинг (терапевтическое воздействие — уже прерогатива клинической, а не общей психологии)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lecture-6-3-история-становления-психологии-как-науки">3. История становления психологии как науки</h3>
+<h4 id="lecture-6-31-античность-три-вектора-понимания-психики">3.1. Античность — три вектора понимания психики</h4>
+<table>
+<thead>
+<tr>
+<th>Мыслитель</th>
+<th>Вектор</th>
+<th>Ключевая идея</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Гераклит</strong></td>
+<td>материалистический</td>
+<td>душа — «огненный логос», нечто текучее, изменчивое</td>
+</tr>
+<tr>
+<td><strong>Демокрит</strong></td>
+<td>механистический</td>
+<td>душа — вещество из шарообразных подвижных атомов огня; всё объясняется физическими причинами</td>
+</tr>
+<tr>
+<td><strong>Аристотель</strong></td>
+<td>биологический/естественнонаучный</td>
+<td>душа и тело неразделимы; функция души — обеспечение биологического существования организма; заложил основы наблюдения как метода (в т. ч. за поведением птиц)</td>
+</tr>
+<tr>
+<td><strong>Сократ, Платон</strong></td>
+<td>духовно-этический (идеалистический)</td>
+<td>душа — самостоятельная, вечная субстанция, управляющая телом; существует мир идей вне материи; истинное познание — через освобождение души от тела</td>
+</tr>
+<tr>
+<td><strong>Пифагор</strong></td>
+<td>—</td>
+<td>душа связана с гармонией и числом; идея «сакрального числа семь» (7-летние циклы развития — предвосхищение возрастных периодизаций)</td>
+</tr>
+<tr>
+<td><strong>Гиппократ</strong></td>
+<td>—</td>
+<td>гуморальная теория темперамента (кровь → сангвиник, жёлтая жёлчь → холерик, чёрная жёлчь → меланхолик, слизь → флегматик)</td>
+</tr>
+</tbody>
+</table>
+<p>У античных философов не было экспериментального метода, но были догадки о природе души, конфликте разума и страстей — основа для дальнейшего развития психологии. Схоластика (Авиценна, Фома Аквинский) добавила христианскую составляющую и сохранила/перевела античное наследие для университетов Средневековья.</p>
+<h4 id="lecture-6-32-философия-нового-времени-и-естественно-научный-этап">3.2. Философия Нового времени и естественно-научный этап</h4>
+<ul>
+<li><strong>Декарт</strong> — начало изучения связи физиологии и психики; дуализм души и тела.</li>
+<li><strong>Вебер и Фехнер</strong> — доказали, что ощущение измеримо математически (психофизика).</li>
+<li><strong>Гельмгольц</strong> — измерил время реакции, показав, что психические процессы протекают во времени и зависят от нервной системы.</li>
+<li><strong>1879 год — Вильгельм Вундт</strong> открыл первую экспериментальную психологическую лабораторию в Лейпциге: психология официально стала наукой и профессией. Изучал сознание методом интроспекции.</li>
+<li><strong>Эббингауз</strong> — изучал память через бессмысленные слоги.</li>
+</ul>
+<p><strong>Кризис психологии сознания (начало XX века):</strong> самонаблюдение непроверяемо и невоспроизводимо; гештальтпсихологи доказали, что сознание — целое, а не сумма частей; в 1913 году прозвучал тезис, что предмет психологии — поведение, а не сознание; Первая мировая война показала иррациональность человека, что старая психология не объясняла. Единая психология распалась на конкурирующие школы — это и есть содержание кризиса.</p>
+<h4 id="lecture-6-33-вклад-философии-в-психологию">3.3. Вклад философии в психологию</h4>
+<p>Философия впервые отделила внутренний мир человека от тела, поставила вопрос об их связи (не решён до сих пор), сформировала базовые понятия психологии (Личность, Сознание, Психика, Свобода воли). Пять направлений влияния: постановка фундаментальных вопросов (Платон, Аристотель, Декарт); разработка методологии (интроспекция — от Декарта и Локка к Вундту; феноменология Гуссерля — к гештальтпсихологии; Гегель и Маркс — к культурно-исторической теории Выготского); формирование моделей сознания (дуализм Декарта, ассоцианизм Гартли, кантианство); критическая рефлексия границ знания; влияние на современные направления (философия сознания — Деннет, Чалмерс; энактивизм — Варела, Томпсон).</p>
+<p><strong>Кант</strong> отрицал возможность психологии как науки (внутренний опыт нельзя измерить, над душой нельзя ставить эксперимент) — но Фехнер и Вундт сняли оба возражения. <strong>Гегель</strong> первым представил сознание как процесс, а не готовую вещь (основа возрастной психологии); индивидуальное сознание формируется культурой (предшественник теории Выготского); самосознание рождается через признание другим человеком.</p>
+<p>Путь от философии к отечественной психологии — фигура <strong>С. Л. Рубинштейна</strong>: философ по образованию, его лекции по философии («Человек и мир») настолько впечатлили А. Н. Леонтьева и Л. С. Выготского, что они пригласили его на кафедру психологии, которую он впоследствии возглавил.</p>
+<h4 id="lecture-6-34-научные-школы-xx-века">3.4. Научные школы XX века</h4>
+<table>
+<thead>
+<tr>
+<th>Школа</th>
+<th>Основатели / ключевые фигуры</th>
+<th>Суть</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Бихевиоризм</strong></td>
+<td>Дж. Уотсон, Э. Торндайк («закон эффекта»), И. П. Павлов (условные рефлексы), необихевиористы — Э. Толмен (когнитивные карты), Б. Скиннер (оперантное обусловливание), А. Бандура (эксперимент «кукла Бобо» — научение через наблюдение)</td>
+<td>Предмет — наблюдаемое поведение, а не сознание; формула «стимул → реакция»</td>
+</tr>
+<tr>
+<td><strong>Психоанализ</strong></td>
+<td>З. Фрейд («Толкование сновидений», структура «Оно — Я — Сверх-Я»); К. Г. Юнг (коллективное бессознательное, архетипы); А. Адлер (индивидуальная психология, компенсация неполноценности); Э. Эриксон (психосоциальное развитие); К. Хорни (социокультурные факторы)</td>
+<td>Значительная роль бессознательных процессов и влечений</td>
+</tr>
+<tr>
+<td><strong>Гештальтпсихология</strong></td>
+<td>М. Вертгеймер (фи-феномен), В. Кёлер, К. Коффка, К. Левин (теория поля, уровень притязаний, эффект Зейгарник)</td>
+<td>Психика — целостная структура («гештальт»); законы восприятия — фигура/фон, близость, сходство, замкнутость</td>
+</tr>
+<tr>
+<td><strong>Гуманистическая психология</strong> («третья сила»)</td>
+<td>А. Маслоу (пирамида потребностей), К. Роджерс (терапевт-партнёр; эмпатия, безусловное принятие, конгруэнтность)</td>
+<td>Человек способен к росту, выбору, самоопределению</td>
+</tr>
+</tbody>
+</table>
+<h4 id="lecture-6-35-отечественная-психология">3.5. Отечественная психология</h4>
+<p>Отличительная черта — родилась не из философии (как в Германии), а <strong>из физиологии</strong>.</p>
+<ul>
+<li><strong>И. М. Сеченов</strong> («Рефлексы головного мозга») — психическое объяснено через работу мозга, а не через «душу»; основоположник отечественной научной психологии.</li>
+<li><strong>И. П. Павлов</strong> — учение об условных рефлексах и высшей нервной деятельности (Нобелевская премия, 1904).</li>
+<li><strong>В. М. Бехтерев</strong> — рефлексология; первая в России экспериментальная психологическая лаборатория (Казань, 1885), психоневрологический институт (Петербург, 1907).</li>
+<li><strong>Г. И. Челпанов</strong> — открыл психологический институт в Москве.</li>
+<li><strong>«Золотое время» советской школы:</strong> Л. С. Выготский — теория высших психических функций, зона ближайшего развития; его ученики — А. Н. Леонтьев (теория деятельности, ведущая деятельность), А. Р. Лурия (основатель нейропсихологии), Д. Б. Эльконин (периодизация возрастного развития); С. Л. Рубинштейн («Основы общей психологии», принцип единства сознания и деятельности); Б. Г. Ананьев (комплексный подход к человеку, Ленинградская школа).</li>
+<li>В довоенные годы — разгром педологии, запрет тестирования на десятилетие; отдельные учёные подвергались гонениям (утверждение об аресте Выготского прозвучало от студента-докладчика, но преподаватель сама не подтвердила этот факт — привожу с этой оговоркой).</li>
+<li>Послевоенное развитие: Б. М. Теплов и В. Д. Небылицын — дифференциальная психология; 1966 — факультет психологии ЛГУ; 1971 — Институт психологии АН (Б. Ф. Ломов, инженерная психология).</li>
+<li>Научные школы: Московская (Выготский → Лурия, Леонтьев; Гальперин и Талызина — поэтапное формирование умственных действий), Ленинградская/Петербургская (Бехтерев → Ананьев; Мясищев и Ломов — психология труда), школа Узнадзе (теория установки), Запорожца, Эльконина, Платонова, Пермская школа (В. Н. Мясищев — концепция психологии отношений).</li>
+</ul>
+<h4 id="lecture-6-36-психология-в-системе-наук-о-человеке">3.6. Психология в системе наук о человеке</h4>
+<ul>
+<li>Академик <strong>Б. Г. Ананьев</strong> называл психологию «интегратором всех человеческих дисциплин» — связующим звеном между естественными и гуманитарными науками.</li>
+<li>Академик <strong>Б. М. Кедров</strong> предложил модель «треугольник наук»: вершина — философские науки, левый угол — естественные (физика, химия, биология), правый угол — общественные (история, социология, экономика); психология — внутри треугольника, на пересечении связей со всеми тремя вершинами.</li>
+<li>«Дерево» отраслей психологии, растущее из общей психологии: дифференциальная психология → возрастная психология → (с 70–80-х годов XX века) детская психология и психология развития; социальная психология (Мясищев, Андреева); педагогическая психология (Гальперин, Талызина); психология стресса (с 1970–80-х годов, Г. Селье); геронтопсихология.</li>
+</ul>
+<h3 id="lecture-6-4-домашнее-задание-понятие-психики-и-сознания-к-18092026">4. Домашнее задание: «Понятие психики и сознания» (к 18.09.2026)</h3>
+<h4 id="lecture-6-задание">Задание</h4>
+<ol>
+<li>Два подхода к трактовке психики — идеалистический и материалистический.</li>
+<li>Развитие психики в филогенезе.</li>
+<li>Роль врождённого и приобретённого в развитии психики.</li>
+</ol>
+<h4 id="lecture-6-ответ">Ответ</h4>
+<p><strong>1. Идеалистический и материалистический подходы к трактовке психики</strong></p>
+<p>Оба подхода восходят ещё к античности (см. раздел 3.1 выше) и продолжают присутствовать в психологии как две принципиально разные онтологические позиции по вопросу «что такое психика и как она связана с телом/материей».</p>
+<ul>
+<li><strong>Идеалистический подход.</strong> Психика (душа, сознание) рассматривается как самостоятельная, независимая от материи субстанция — первичная по отношению к телу, а иногда и к материальному миру в целом. Классический пример — Платон: душа — вечная, божественная сущность, временно заключённая в теле; истинное познание достигается освобождением от «оков» тела. В философии Нового времени эта линия продолжена дуализмом Декарта (душа и тело — две разные субстанции, взаимодействующие через шишковидную железу) и немецким классическим идеализмом (Кант: психика непознаваема научными методами; Гегель: сознание — саморазвивающийся дух). В психологии XX века отголоски идеализма — в феноменологии Гуссерля и экзистенциальной психологии, где subjective conscious experience рассматривается как исходная, не сводимая к физиологии реальность.</li>
+<li><strong>Материалистический подход.</strong> Психика — свойство высокоорганизованной материи (мозга), продукт и функция нервной системы, вторичная по отношению к материи и возникающая на определённом этапе эволюции. Родоначальник линии — Демокрит (душа — материальные атомы); в Новое время — французские материалисты и, в первую очередь, отечественная традиция: Сеченов («психическое — рефлекс мозга»), Павлов (высшая нервная деятельность), бихевиористы (изучают только объективно наблюдаемое поведение как реакцию организма на среду).</li>
+<li><strong>Диалектико-материалистический подход</strong> (методологическая база советской и современной отечественной психологии) занимает промежуточную, снимающую крайности обеих позиций точку зрения: психика — не «вещество» и не мистическая субстанция, а <strong>особое свойство высокоорганизованной материи (мозга), возникающее в процессе отражения объективной действительности</strong> и обеспечивающее ориентировку и регуляцию поведения организма в среде. Психика идеальна по своему содержанию (образы, мысли, переживания не являются веществом), но материальна по своему субстрату и происхождению (без мозга и без взаимодействия организма со средой психики не существует) — это и есть снятие противоречия между «чистым» идеализмом и «вульгарным» материализмом (который сводил психику напрямую к веществу, например к выделениям мозга — позиция, отвергнутая уже в XIX веке). Именно на этой методологической основе Выготский, Леонтьев и Рубинштейн строили культурно-историческую теорию и теорию деятельности, разбиравшиеся на занятии: психика формируется и проявляется в деятельности, а высшие психические функции социальны по происхождению и опосредованы культурными орудиями (знаками, речью) — то есть психика одновременно и идеальна (по содержанию отражения), и материально/социально обусловлена (по механизму формирования).</li>
+</ul>
+<p><strong>2. Развитие психики в филогенезе</strong></p>
+<p>Филогенез психики — это историческое развитие психики как свойства живых организмов в процессе эволюции видов (в отличие от онтогенеза — развития психики отдельной особи). Общепринятая в отечественной психологии схема (заложена А. Н. Леонтьевым, детализирована К. Э. Фабри) выделяет несколько стадий, каждая из которых связана с усложнением нервной системы и форм взаимодействия организма со средой:</p>
+<ol>
+<li><strong>Стадия элементарной раздражимости</strong> (простейшие, растения) — организм реагирует только на биологически значимые (жизненно важные) воздействия среды напрямую, без опосредующего психического отражения в строгом смысле; это ещё «допсихическая» форма приспособления.</li>
+<li><strong>Стадия элементарной сенсорной психики</strong> (низшие многоклеточные, черви, моллюски) — появляется способность отражать отдельные свойства предметов (раздражители, биологически нейтральные сами по себе, но сигнализирующие о значимых объектах) — то есть возникает собственно <strong>чувствительность</strong> (по А. Н. Леонтьеву — критерий появления психики как таковой: организм начинает реагировать не только на прямо жизненно значимые воздействия, но и на их сигналы). Поведение преимущественно инстинктивное, врождённо запрограммированное.</li>
+<li><strong>Стадия перцептивной психики</strong> (членистоногие, головоногие моллюски, позвоночные) — отражение не отдельных свойств, а целостных образов предметов и ситуаций (восприятие); появляется элементарная способность к научению, формированию индивидуального опыта поверх врождённых инстинктивных программ; усложняется нервная система (появление и развитие головного мозга).</li>
+<li><strong>Стадия интеллекта</strong> (высшие позвоночные, прежде всего приматы) — способность отражать не только отдельные предметы, но и <strong>отношения между предметами</strong>, решать двухфазные задачи (использование орудий, обходные пути), перенос найденного решения в новую ситуацию; при этом поведение остаётся привязанным к наглядно воспринимаемой ситуации «здесь и сейчас» — животные не способны к абстрактному, отвлечённому от конкретной ситуации мышлению.</li>
+<li><strong>Стадия сознания</strong> (человек) — качественный, а не только количественный скачок: возникает благодаря переходу от биологической эволюции к социально-историческому развитию. Ключевой фактор — <strong>совместный труд с использованием и изготовлением орудий и возникновение речи</strong> (языка как системы знаков): это позволяет закреплять и передавать опыт не генетически и не индивидуально, а через культуру — из поколения в поколение. Психика человека приобретает принципиально новые свойства: произвольность психических процессов, способность к абстрактному (понятийному) мышлению, самосознание, рефлексия — то есть собственно <strong>сознание</strong>, которое (согласно культурно-исторической теории Выготского, разбиравшейся на занятии) само формируется прижизненно, через овладение культурными знаками, а не задано биологически.</li>
+</ol>
+<p>Общая логика филогенетического развития психики — от простого реагирования на прямые жизненно значимые стимулы к отражению всё более сложных, опосредованных, целостных и отвлечённых от непосредственной ситуации связей и отношений действительности, а на высшей, человеческой ступени — к появлению социально и культурно (а не только биологически) обусловленного сознания.</p>
+<p><strong>3. Роль врождённого и приобретённого в развитии психики</strong></p>
+<p>Вопрос о соотношении врождённого (наследственного, генетически заданного) и приобретённого (сформированного в результате взаимодействия со средой, обучения, опыта) — один из центральных и исторически наиболее спорных в психологии развития; в западной традиции он известен как спор <strong>«nature vs. nurture»</strong> («природа против воспитания»).</p>
+<ul>
+<li><strong>Нативистская позиция</strong> (крайний вариант) настаивает на преимущественно врождённой, генетически предопределённой природе психических способностей: созревание психических структур происходит по внутренней биологической программе, среда лишь «запускает» или минимально корректирует заранее заданное развитие. Классические иллюстрации: явление <strong>импринтинга</strong> (К. Лоренц) — мгновенное и необратимое запечатление врождённо предуготованного образа (например, образа матери у птенцов) в строго определённый, генетически заданный <strong>сенситивный (критический) период</strong>; гипотеза Н. Хомского о врождённом «устройстве усвоения языка» (language acquisition device), объясняющая, почему дети всех культур усваивают грамматику родного языка с поразительной скоростью и без прямого целенаправленного обучения.</li>
+<li><strong>Эмпирическая (средовая) позиция</strong> (крайний вариант — бихевиористская: Дж. Уотсон, Б. Скиннер) настаивает на решающей роли среды, научения и подкрепления: психика и поведение практически полностью формируются прижизненным опытом, а врождённые задатки предельно пластичны и малозначимы (крайняя формулировка Уотсона — «дайте мне дюжину здоровых младенцев… и я гарантирую, что смогу сделать из любого специалиста любого профиля»).</li>
+<li><strong>Современная и отечественная (принятая в разбиравшихся на занятии концепциях) позиция</strong> отвергает обе крайности и рассматривает развитие психики как результат <strong>неразрывного взаимодействия</strong> врождённого и приобретённого, а не их механического «сложения» или конкуренции:</li>
+<li><strong>Врождённое (задатки, созревание)</strong> задаёт исходный потенциал, темп и общие возрастные рамки развития той или иной функции — как обсуждалось на самой лекции применительно к теме «Психология развития» (⚠️ этот материал относится к тому курсу, а не к разбираемому здесь занятию, но напрямую иллюстрирует данный вопрос): речевые зоны мозга должны определённым образом созреть, прежде чем ребёнок физиологически сможет заговорить; структуры, отвечающие за прямохождение, должны вызреть к определённому возрасту. Генетика во многом определяет и индивидуальный темп развития, и характерологические предрасположенности.</li>
+<li><strong>Приобретённое (научение, культурная среда, обучение)</strong> определяет, будет ли реализован заложенный потенциал, в каком объёме и в какой конкретной форме. Ключевая для отечественной психологии идея — принадлежащее Л. С. Выготскому понятие <strong>зоны ближайшего развития</strong>: то, что ребёнок сегодня может сделать только с помощью взрослого, при правильно организованном обучении завтра сможет делать самостоятельно — то есть обучение не просто следует за созреванием, а способно вести развитие за собой, но только в пределах, заданных наличным (созревшим) потенциалом ребёнка.</li>
+<li>Существуют <strong>сенситивные периоды развития</strong> — возрастные промежутки повышенной восприимчивости к определённым видам воздействий среды (например, ранний возраст — для развития речи): врождённая биологическая «готовность» здесь создаёт лишь окно возможностей, а его фактическое наполнение полностью зависит от того, насколько адекватна и своевременна образовательная/коммуникативная среда.</li>
+<li>С точки зрения культурно-исторической теории (Выготский) и теории деятельности (Леонтьев), специфически человеческие, высшие психические функции (произвольная память, понятийное мышление, речь) вообще <strong>не даны от природы биологически, а формируются исключительно прижизненно</strong> — через овладение культурными орудиями (прежде всего знаками и речью) в совместной деятельности и общении со взрослым; в этом смысле для высших психических функций роль социального/приобретённого фактора первична, тогда как врождённое (нейрофизиологическая зрелость мозга) выступает необходимой, но не достаточной предпосылкой.</li>
+</ul>
+<p><strong>Итоговый тезис для всех трёх вопросов:</strong> современная психология не выбирает между идеализмом и материализмом, между врождённым и приобретённым — она рассматривает психику как идеальное по содержанию, но материальное и социальное по происхождению явление, которое в филогенезе усложнялось от простой раздражимости до человеческого сознания именно благодаря переходу от чисто биологической эволюции к социально-культурному наследованию опыта, а в онтогенезе каждого конкретного человека разворачивается как постоянное, неразрывное взаимодействие врождённых предпосылок (задатков, созревания) и приобретаемого в общении, деятельности и обучении культурного опыта.</p>
+</section>
+<section class="topic-content" id="lecture-7">
+<h2 id="lecture-7-лекция-7-коллективное-поведение">Лекция 7 — «Коллективное поведение»</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-7-1-группа-понятие-и-основания-классификации">1. Группа: понятие и основания классификации</a></li>
+<li class="lvl-main"><a href="#lecture-7-2-динамика-развития-группы-модель-такмана">2. Динамика развития группы: модель Такмана</a></li>
+<li class="lvl-main"><a href="#lecture-7-3-коллективное-поведение-как-отличить-от-просто-совместного">3. Коллективное поведение: как отличить от «просто совместного»</a></li>
+<li class="lvl-main"><a href="#lecture-7-4-определения-коллективного-поведения-и-историческая-эволюция-понятия">4. Определения коллективного поведения и историческая эволюция понятия</a></li>
+<li class="lvl-main"><a href="#lecture-7-5-признаки-спонтанного-коллективного-поведения-итоговое-резюме">5. Признаки спонтанного коллективного поведения (итоговое резюме)</a></li>
+<li class="lvl-main"><a href="#lecture-7-6-практикум-разбор-кейсов-коллективное-поведение-или-нет">6. Практикум: разбор кейсов «коллективное поведение или нет»</a></li>
+<li class="lvl-main"><a href="#lecture-7-7-демонстрационное-упражнение-установки-и-искажение-информации-при-пер">7. Демонстрационное упражнение: установки и искажение информации при передаче («испорченный телефон»)</a></li>
+<li class="lvl-main"><a href="#lecture-7-8-домашнее-задание">8. Домашнее задание</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 12.09.2026 · <strong>Преподаватель:</strong> Ловков С.Г.<br />
+<strong>Дисциплина:</strong> магистратура, психологическое сопровождение служебной деятельности (силовые структуры) — занятие посвящено психологии групп и (спонтанного) коллективного поведения</p>
+<blockquote>
+<p>Это учебный конспект — организационные моменты, знакомство группы и техническая часть занятия сюда не включены. Полная расшифровка записи (со всеми оргвопросами) хранится в <a href="7_лекция.md">7_лекция.md</a> в этой же папке.</p>
+</blockquote>
+<h3 id="lecture-7-1-группа-понятие-и-основания-классификации">1. Группа: понятие и основания классификации</h3>
+<p><strong>Группа</strong> — относительно устойчивая во времени общность людей (понятие устойчивости расплывчато: формально под него попадают даже пассажиры одной маршрутки).</p>
+<table>
+<thead>
+<tr>
+<th>Основание</th>
+<th>Виды</th>
+<th>Пояснение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>По размеру</td>
+<td>малые / большие</td>
+<td>Зарубежная психология: верхняя граница малой группы — число (обычно 10–20 чел.), нижняя — спорна (2 или 3 чел.: только с 3-м лицом появляются местоимения «я — ты — он», некоторые феномены невозможны вдвоём). Отечественная психология (деятельностный подход): верхняя граница малой группы — почти до 40 чел., поскольку важна не только прямая коммуникация, но и общая деятельность.</td>
+</tr>
+<tr>
+<td>По характеру связей</td>
+<td>непосредственные / опосредованные (вторичные, инструментальные)</td>
+<td>Непосредственные — прямое общение каждого с каждым (малая группа). Опосредованные — через коммуникационные средства или иерархию (например, представителей от подгрупп).</td>
+</tr>
+<tr>
+<td>По оформленности</td>
+<td>формальные / неформальные</td>
+<td>Формальная — организована «сверху», писаные правила членства и поведения. Неформальная — без писаных правил, но с неписаными нормами (пример: сообщество владельцев собак).</td>
+</tr>
+<tr>
+<td>По значимости для участника</td>
+<td>референтная группа / группа членства</td>
+<td>Референтная — где человек хочет быть, считает важным. Группа членства — куда включён независимо от своей воли (например, нелюбимая работа). <strong>Единственное субъективное основание</strong> — одна и та же группа для одного человека референтна, для другого — просто членство; остальные основания объективны.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Термины:</strong> in-группа — группа, к которой причисляет себя говорящий («мы»); out-группа — «они».</p>
+<p><strong>Групповые феномены:</strong><br />
+- <strong>Ин-групповой фаворитизм / аут-групповая дискриминация</strong> — благожелательность к своим и настороженность к чужим (эволюционный механизм «свой–чужой»).<br />
+- <strong>Гомогенность аут-группы</strong> — члены чужой группы воспринимаются как более однородные («все одинаковые»); негативный поступок своего связываем с конкретным человеком, чужого — приписываем всей его группе → почва для ксенофобии.<br />
+- <strong>Феномен «чёрной овцы»</strong> — к своим предъявляются более строгие моральные требования, чем к чужим («ты же психолог, как ты мог» vs «он не психолог, что с него взять»).<br />
+- Также упомянуты (без подробностей): социальная фасилитация / социальная леность, групповое мышление, конформизм.</p>
+<p><strong>Рекомендованная литература:</strong> учебник социальной психологии Д. Майерса (⚠️ в записи фамилия звучит как «Майкс» — искажение).</p>
+<h3 id="lecture-7-2-динамика-развития-группы-модель-такмана">2. Динамика развития группы: модель Такмана</h3>
+<p>Модель (в первую очередь — для рабочей, формальной группы с закреплённым составом и общей задачей):</p>
+<ol>
+<li><strong>Формирование (forming)</strong> — подчёркнутая вежливость, много времени уходит на согласования вместо дела.</li>
+<li><strong>Шторм (storming)</strong> — люди начинают проявлять личные амбиции и организаторские претензии; возникает предконфликтная ситуация; в настоящий конфликт перерастает только при наличии противоречия интересов — но чаще разрешается конструктивно (интерес-то общий — повысить продуктивность).</li>
+<li><strong>Нормирование (norming)</strong> — группа вырабатывает и фиксирует правила.</li>
+<li><strong>Продуктивность (performing)</strong> — пик эффективности: правила работают, группа эволюционно их совершенствует, понимает друг друга «с полуслова».</li>
+<li><strong>Стагнация/распад</strong> — при угрозе целостности группы (внешние изменения: перевод сотрудника, сокращение штата, окончание проекта) группа начинает принимать решения ради самосохранения, а не ради эффективности — это и есть признак начавшегося распада. Причины бывают внутренние/объективные (проект завершился) и внешние (изменилась ситуация на рынке).</li>
+</ol>
+<p>На стадиях norming/performing возникают лидерство, подчинение, культурные нормы группы, групповое мышление и поляризация мнений. Для больших групп (толпа) характерны ещё деиндивидуализация и анонимизация — они и объясняют коллективное поведение.</p>
+<h3 id="lecture-7-3-коллективное-поведение-как-отличить-от-просто-совместного">3. Коллективное поведение: как отличить от «просто совместного»</h3>
+<p><strong>Ключевой критерий (узкое понимание) — спонтанность.</strong> Рабочие на конвейере, синхронно выполняющие каждый свою операцию, — <strong>не</strong> коллективное поведение: они действуют по норме/инструкции, а не спонтанно (проверка «от противного»: 99 из 100 рабочих можно заменить роботами без потери результата — при коллективном же поведении, например в панике, убрав толпу и оставив одного человека, его поведение изменится кардинально — он станет действовать гораздо более рационально).</p>
+<p>Более широкое понятие — <strong>«культурное коллективное поведение»</strong>: в отличие от спонтанного, оно уже транслируется нормами (институциализировано).</p>
+<p><strong>Терминологическая оговорка лектора.</strong> В отечественной психологии труда слово «коллектив» ассоциируется именно с рабочей группой (по Такману — высшая точка развития, этап performing). Формально называть толпу на площади «коллективом» — противоречиво; более точным термином было бы «массовое поведение», но и оно не идеально (коллективное поведение может проявляться и в группе всего из 10 человек, а не только у «масс» в сотни тысяч). Термин «коллективное поведение» используется за неимением лучшего; по умолчанию имеется в виду именно <strong>спонтанное</strong> коллективное поведение.</p>
+<h3 id="lecture-7-4-определения-коллективного-поведения-и-историческая-эволюция-понятия">4. Определения коллективного поведения и историческая эволюция понятия</h3>
+<table>
+<thead>
+<tr>
+<th>Школа / автор</th>
+<th>Период</th>
+<th>Ключевые идеи</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Школа психологии масс</strong> (Гюстав Лебон, «Психология масс»; далее — Фрейд, Серж Московичи, книга «Век толп»)</td>
+<td>рубеж XIX–XX вв.</td>
+<td>Субъект коллективного поведения — <strong>толпа</strong>. Толпе присущи анонимность (человека «не выковырять» из толпы) и деперсонализация (растворение «я» в общем самоощущении толпы) → высокая внушаемость и подверженность эмоциональному заражению. Толпа действует под влиянием лидера (лидер = воплощение идеала, «идеальное я» толпы) или стихийных факторов. Оценка явления — однозначно негативная (у Московичи — пессимистичный прогноз «заката цивилизации» из-за роста масс и развития коммуникаций). Методологически — умозрительные представления, а не эмпирические исследования.</td>
+</tr>
+<tr>
+<td><strong>Чикагская школа</strong> (Г. Блумер и др.)</td>
+<td>первая половина XX в.</td>
+<td>Полемика со школой масс: человек в толпе <strong>остаётся человеком</strong>, просто возникают особые связи и взаимодействия. Ключевые понятия: циркуляция настроений (усиливаются, «побывав» внутри толпы), «рапорт» (термин из гипноза), коллективное внимание, формирование общих установок (ср. Узнадзе: установка — предрасположенность понимать и действовать определённым образом). Роль лидера — организатор (не идеал); у толпы остаётся рациональность. Оценка — толпа не обязательно плохо: это путь к формированию новых норм и институтов. Методологически — реальные, в т.ч. масштабные эмпирические исследования.</td>
+</tr>
+<tr>
+<td><strong>Блумер (уточнение определения)</strong></td>
+<td>там же</td>
+<td>Под «поведением» — не только действие, но и способ восприятия/мышления: синхронизируется не только действие, но и восприятие членов аморфной группы («толпы»). Обязательное условие коллективного поведения — отсутствие стандартного шаблона поведения в данной ситуации.</td>
+</tr>
+<tr>
+<td><strong>Современные определения (Тёрнер и Кил(л)иан ⚠️)</strong></td>
+<td>позже</td>
+<td>Коллективное поведение — <strong>мобилизация на основе обобщённого убеждения</strong>; «мостик» от ситуации неопределённости к новым нормам, то есть к <strong>институциализации</strong>. Рассматривают коллективное поведение как приток новых норм, средство адаптации (сам механизм возникновения не разбирают).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Механизм формирования коллективного поведения</strong> (пример — пожар):<br />
+1. Смутное непонятное напряжение (запах гари) →<br />
+2. Обобщённое подозрение в голове каждого («не пожар ли?») →<br />
+3. Провоцирующий фактор — кто-то вслух произносит «пожар» →<br />
+4. Люди ищут выход, кто-то устремляется к предполагаемому (не обязательно верному) выходу →<br />
+5. Остальные копируют это поведение (частично рационально — «он знает дорогу», частично просто «раз все побежали») →<br />
+6. Этап мобилизации →<br />
+7. Включаются механизмы социального контроля (администрация направляет к настоящему выходу, разбор инцидента) → <strong>институциализация</strong>: закрепление в виде культурных норм и процедур (правила эвакуации, планы эвакуации на стенах, назначенные ответственные, инструкции).</p>
+<p><strong>Примеры явлений, относимых к коллективному поведению:</strong> паника, бунты и беспорядки; мода и тренды (уже ближе к культурному коллективному поведению — происходят в рамках институтов); слухи, массовая истерия, ажиотаж.</p>
+<h3 id="lecture-7-5-признаки-спонтанного-коллективного-поведения-итоговое-резюме">5. Признаки спонтанного коллективного поведения (итоговое резюме)</h3>
+<ol>
+<li><strong>Спонтанность</strong> — не организовано, не структурировано заранее.</li>
+<li><strong>Вовлечённость эмоций</strong> — эмоциональное заражение на почве анонимности и деиндивидуализации (человек отбрасывает привычный стиль поведения).</li>
+<li><strong>Единообразие действий</strong> — участники делают похожее и похожим образом воспринимают происходящее.</li>
+<li><strong>Временный характер</strong> — быстро завершается, не длится неопределённо долго.</li>
+</ol>
+<h3 id="lecture-7-6-практикум-разбор-кейсов-коллективное-поведение-или-нет">6. Практикум: разбор кейсов «коллективное поведение или нет»</h3>
+<table>
+<thead>
+<tr>
+<th>Ситуация</th>
+<th>Вывод</th>
+<th>Обоснование (кратко)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Очередь в коридоре к терапевту, все смотрят в телефоны</td>
+<td><strong>Нет</strong></td>
+<td>Институционально предусмотрено (стулья в коридоре), нет спонтанности и эмоционального заражения, каждый понимает рациональный мотив нахождения там</td>
+</tr>
+<tr>
+<td>Толпа зевак у горящего дома (~50 чел., снимают на телефон)</td>
+<td><strong>Да</strong></td>
+<td>Все признаки: спонтанность, эмоциональное заражение (толпа «притягивает» задержаться), единообразие действий, временный характер</td>
+</tr>
+<tr>
+<td>Аварийная эвакуация из самолёта после жёсткой посадки</td>
+<td><strong>Смешанный случай</strong></td>
+<td>Основной процесс — институциональный (по инструкциям бортпроводников), но отдельные элементы (крики, хватание ручной клади) — спонтанные, вызванные эмоциональным возбуждением; в целом «спонтанное поведение зародилось, но не развилось»</td>
+</tr>
+<tr>
+<td>Крестный ход (пение молитв, слёзы, у части — состояние, близкое к экстазу)</td>
+<td><strong>«Культурное коллективное поведение» — пограничный случай</strong></td>
+<td>С одной стороны — строго регламентированный, ежегодно повторяющийся ритуал (порядок следования, регламент пения); с другой — явные эмоциональное заражение и групповое восприятие единства. Ритуал специально создан, чтобы вызывать определённое ожидаемое состояние (благоговение), — аналогично тому, как кино или спектакль погружают зрителя в состояние</td>
+</tr>
+<tr>
+<td>Слух о дефиците сахара → ажиотажная скупка</td>
+<td><strong>Да</strong></td>
+<td>Классический пример: слух + ажиотаж</td>
+</tr>
+<tr>
+<td>Субботник по объявлению ТСЖ (кто-то по своей инициативе красит забор)</td>
+<td><strong>Нет</strong></td>
+<td>Заранее анонсировано администрацией; даже инициативная покраска забора не выходит за рамки общей регламентированной деятельности — участники не копируют поведение соседа бездумно, а действуют по целесообразности</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lecture-7-7-демонстрационное-упражнение-установки-и-искажение-информации-при-пер">7. Демонстрационное упражнение: установки и искажение информации при передаче («испорченный телефон»)</h3>
+<p>Группа разделена на две подгруппы (по чётности дня рождения). Первая подгруппа по цепочке передаёт описание картинки (изображение из ТАТ — тематического апперцептивного теста: женщина ~40–45 лет наклонилась к девочке ~12–14 лет, девочка отвернулась, женщина опирается локтем на небольшой стол); первому участнику цепочки дана секретная установка — фокусироваться на общей ситуации, а не на деталях. Вторая подгруппа наблюдает, какие детали при передаче терялись/появлялись.</p>
+<p><strong>Результат наблюдения:</strong> по мере передачи по цепочке эмоциональная окраска описания то усиливалась (у части участников — предположение «мама ругает девочку», хотя изначально речь шла только о «спрашивает/уточняет»), то полностью терялась в пользу «технического» пересказа фактов; отдельные детали (размер стола, направление, в которое отвернулась девочка) выпадали ближе к концу цепочки. Наблюдение группы: эмоциональная окраска добавлялась и убиралась в зависимости от индивидуального стиля восприятия каждого передающего — то есть установка (секретная инструкция + личный стиль) заметно влияет на то, что «выживает» при коллективной передаче информации.</p>
+<p><strong>Практический вывод для работы с коллективами:</strong> передача информации внутри группы (слухи, инструктаж, «испорченный телефон» в рабочем коллективе) систематически искажается под влиянием индивидуальных установок звеньев цепи — это стоит учитывать при организации коммуникации в подразделении.</p>
+<h3 id="lecture-7-8-домашнее-задание">8. Домашнее задание</h3>
+<p>На этом занятии домашнее задание <strong>не задавалось</strong>. Лектор ограничился просьбой подумать над темами, интересными для будущих занятий, и зафиксировал уже прозвучавшие запросы группы: работа с сопротивлением изменениям, конфликты, формирование корпоративной культуры («культурной матрицы») для более гладкого встраивания новых людей в коллектив.</p>
+<hr />
+<p><strong>Литература, упомянутая на занятии:</strong> Д. Майерс. Социальная психология (учебник) — рекомендован как источник с интересным изложением групповых феноменов; ⚠️ фамилия в записи звучит нестабильно («Майкс»), это наиболее вероятное прочтение.</p>
+<p><strong>⚠️ Общая пометка о точности терминов:</strong> ряд фамилий и терминов (Тёрнер и Кил(л)иан/Killian, Московичи/«Москвиси», Майерс/«Майкс») распознаны речевым движком нестабильно и восстановлены по наиболее вероятному звучанию — при подготовке к экзамену/зачёту стоит сверить точное написание по первоисточникам.</p>
+</section>
+<section class="topic-content" id="lecture-8">
+<h2 id="lecture-8-лекция-8-психология-развития-предмет-и-история-науки-категориальный-ап">Лекция 8 — «Психология развития»: предмет и история науки, категориальный аппарат, закономерности развития</h2>
+<nav class="mini-toc"><div class="mini-toc-label">На этой странице</div><ul>
+<li class="lvl-main"><a href="#lecture-8-1-психология-развития-как-наука-определение-и-история-возникновения-те">1. Психология развития как наука: определение и история возникновения термина</a></li>
+<li class="lvl-main"><a href="#lecture-8-2-категориальный-аппарат-психологии-развития">2. Категориальный аппарат психологии развития</a></li>
+<li class="lvl-main"><a href="#lecture-8-3-закономерности-особенности-психического-развития-полный-список-из-во">3. Закономерности (особенности) психического развития — полный список из восьми пунктов</a></li>
+<li class="lvl-main"><a href="#lecture-8-4-предмет-психологии-развития-три-составляющие-по-л-с-выготскому">4. Предмет психологии развития: три составляющие по Л. С. Выготскому</a></li>
+<li class="lvl-main"><a href="#lecture-8-5-три-закона-развития-по-л-с-выготскому">5. Три закона развития (по Л. С. Выготскому)</a></li>
+<li class="lvl-main"><a href="#lecture-8-6-факторы-влияющие-на-развитие">6. Факторы, влияющие на развитие</a></li>
+<li class="lvl-main"><a href="#lecture-8-7-задачи-и-функции-психологии-развития-как-науки">7. Задачи и функции психологии развития как науки</a></li>
+<li class="lvl-main"><a href="#lecture-8-8-место-психологии-развития-в-системе-наук-о-человеке">8. Место психологии развития в системе наук о человеке</a></li>
+<li class="lvl-main"><a href="#lecture-8-домашнее-задание">Домашнее задание</a></li>
+</ul></nav>
+<p><strong>Дата:</strong> 12.09.2026 · <strong>Преподаватель:</strong> Серебрякова Т. А. · <strong>Дисциплина:</strong> Психология развития (магистерская программа «Психологическое сопровождение служебной деятельности»)</p>
+<blockquote class="warnq">
+<p>Это учебный конспект — организационные моменты (расписание, консультации по курсовым/диссертациям, напоминания про Moodle) сюда не включены. Полная расшифровка записи (со всеми оговорками и предупреждениями о качестве распознавания) хранится в <a href="8_лекция.md">8_лекция.md</a> в этой же папке.</p>
+<p>⚠️ Запись собрана из двух источников: файла <code>0_misfiled_2.mp4</code> (бывший <code>2.mp4</code>, по ошибке выложенный на Яндекс.Диске в папку лекции 6 за 11.09.2026 — восстановлен по содержанию и перенесён сюда) и файла <code>2.mov</code> (продолжение после перерыва). Ранее в конспекте не хватало первых пяти из восьми «особенностей развития» и большей части темы — теперь материал полный, от определения и истории науки до места психологии развития в системе других наук. Подробности находки — в <code>8_лекция.md</code>. Даже сейчас запись, вероятно, начинается не с абсолютного начала пары (первая фраза обрывается на полуслове), но пропущенный кусок — судя по всему, лишь представление ещё одного автора одного из определений, не содержательный блок темы.</p>
+</blockquote>
+<h3 id="lecture-8-1-психология-развития-как-наука-определение-и-история-возникновения-те">1. Психология развития как наука: определение и история возникновения термина</h3>
+<p><strong>Психология развития</strong> — наука, изучающая закономерности этапов психического развития, становления личности во взаимосвязи с возрастом. Наиболее распространённое в учебной литературе определение: психология развития — раздел общей психологии, изучающий развитие психики человека на протяжении всей его жизни, на всех стадиях онтогенеза, с учётом биологических, антропологических, социологических и психологических факторов, оказывающих на процесс развития как непосредственное, так и опосредованное влияние.</p>
+<p><strong>Краткая история науки:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Год / период</th>
+<th>Событие</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1882</strong></td>
+<td>Официальный год рождения психологии развития как науки — выход книги немецкого физиолога и психолога <strong>Вильгельма Прейера</strong> «Душа ребёнка» (наблюдения за развитием собственного сына от рождения до 3 лет)</td>
+</tr>
+<tr>
+<td>70-е гг. XX в.</td>
+<td><strong>А. А. Люблинская</strong>, «Очерки психического развития ребёнка» — на материале докторской диссертации, наблюдения за сыном Сашей от рождения до поступления в вуз</td>
+</tr>
+<tr>
+<td><strong>1965–1967</strong></td>
+<td>Термин «психология развития» официально закрепляется в научном сообществе — спустя 80 с лишним лет после книги Прейера</td>
+</tr>
+<tr>
+<td>Конец XX – начало XXI в.</td>
+<td>Пересмотр границ науки: от изучения только детства — к изучению целостного жизненного пути человека</td>
+</tr>
+</tbody>
+</table>
+<p>Помимо Прейера, в России есть свои примеры подобных «дневников наблюдения»: <strong>Корней Чуковский</strong>, «От двух до пяти» — о речевом развитии внучки Маши; <strong>А. А. Люблинская</strong> (см. таблицу) — самое длительное по охвату исследование (от рождения до поступления в вуз), также затронувшее связь психических проявлений младенца с периодом беременности матери (перинатальная психология).</p>
+<p><strong>Соотношение понятий.</strong> Исторически психология развития долго существовала как <strong>детская психология</strong>, ограничиваясь ранним и дошкольным возрастом — эта тенденция сохраняется в работах многих зарубежных учёных до сих пор (единственное исключение — периодизация <strong>Эрика Эриксона</strong>, охватывающая весь жизненный путь в 8 периодах; на Западе в целом детство растянуто до 17–18 лет, после чего человек резко становится самостоятельным). В отечественной психологии похожая картина: долгое время психология развития ограничивалась первыми 18 годами жизни и нередко называлась <strong>возрастной психологией</strong> — важно не путать эти понятия: строго говоря, возрастная психология в большей степени ориентирована на более взрослые периоды жизни. Сегодня детская психология — один из разделов возрастной психологии, наряду с психологией отрочества/юности, взрослости/зрелости и <strong>геронтопсихологией</strong> (психологией старости и долгожительства).</p>
+<p>К концу XX века вырос запрос общества на изучение всего жизненного пути человека, накоплена большая база знаний — границы науки расширились, каждый возраст стал рассматриваться как часть целостного процесса развития. Сегодня психология развития — <strong>фундаментальная теоретическая дисциплина</strong>, интегрирующая знания не только из психологии, но и из естественных наук, поскольку невозможно исключить биологический фактор развития.</p>
+<h3 id="lecture-8-2-категориальный-аппарат-психологии-развития">2. Категориальный аппарат психологии развития</h3>
+<table>
+<thead>
+<tr>
+<th>Термин</th>
+<th>Определение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Развитие</strong></td>
+<td>Качественные новообразования, возникающие под воздействием разных факторов на том или ином этапе жизни (в противовес простому количественному накоплению). По Л. С. Выготскому, <strong>новообразование</strong> — показатель, присущий каждому возрасту; на некоторых этапах вместо новообразований происходят деструктивные изменения (пример — старость).</td>
+</tr>
+<tr>
+<td><strong>Рост</strong></td>
+<td>Количественные изменения: усовершенствование конкретной функции, увеличение функциональных возможностей.</td>
+</tr>
+<tr>
+<td><strong>Созревание</strong></td>
+<td>Психофизиологический процесс запрограммированного изменения в организме и психике человека в соответствии с генетическим планом. Генетика во многом определяет темп развития (у каждого человека — свой, индивидуальный) и объясняет, что по наследству передаются не только внешние признаки, но и способности, интеллектуальные возможности, личностные и характерологические особенности. Созревание также связано со степенью готовности структур мозга (пример: если ребёнок к 4 годам ещё не говорит — возможно, дело не в патологии, а в том, что соответствующие структуры мозга ещё не созрели; при этом чем больше с ребёнком разговаривают, тем быстрее растёт его пассивный, а затем активный словарь).</td>
+</tr>
+<tr>
+<td><strong>Научение</strong></td>
+<td>Процесс приобретения индивидуального опыта, изменения поведения в результате внешних воздействий (Уотсон, Скиннер, Торндайк — эксперименты на животных; Л. С. Выготский — концепция зон развития; П. Я. Гальперин — интериоризация/экстериоризация, то есть перевод внешних знаний и умений во внутренний план, и обратный процесс).</td>
+</tr>
+<tr>
+<td><strong>Социализация</strong></td>
+<td>Процесс усвоения норм, установок, обычаев, ценностей, ролей и ожиданий конкретной социальной группы, позволяющий человеку полноценно функционировать как члену общества («жить в обществе и быть свободным от общества невозможно»). Нормы социального взаимодействия необходимо прививать с раннего детства (в противовес идее «свободного воспитания», которая затрудняет последующую адаптацию человека в коллективах).</td>
+</tr>
+<tr>
+<td><strong>Возраст</strong></td>
+<td>Понятие, характеризующее конкретный период жизни человека, жёстко ограниченный временными рамками, но обладающий собственным потенциалом, закономерностями и механизмами оптимального развития. Подробный разбор возрастной периодизации — на одном из следующих занятий (26 сентября либо 3 октября).</td>
+</tr>
+</tbody>
+</table>
+<h3 id="lecture-8-3-закономерности-особенности-психического-развития-полный-список-из-во">3. Закономерности (особенности) психического развития — полный список из восьми пунктов</h3>
+<p>Развитие психики подчиняется ряду устойчивых закономерностей (со ссылкой на отечественных исследователей ⚠️ Л. И. Анцыферову и Д. Н. Завалишину — атрибуция по аудио не вполне надёжна). Полный список, восстановленный из обеих частей записи:</p>
+<ol>
+<li><strong>Качественные изменения</strong> — тенденция к качественному изменению, переходу на более совершенные уровни функционирования (соотносится с идеей Л. С. Выготского о новообразованиях).</li>
+<li><strong>Необратимость</strong> — то, чему человек научился, невозможно полностью утратить при отсутствии органических патологий (инсульт — пример именно органического нарушения, причём ишемический инсульт обратим легче геморрагического). Если навык долго не используется, он временно «уходит», но при возврате к деятельности восстанавливается быстро, поскольку уже знаком (обоснование — работы психофизиолога <strong>Н. А. Бернштейна</strong>, изучавшего структуру движений).</li>
+<li><strong>Элементы прогресса и регресса</strong> — пример: освоение ходьбы. Когда у ребёнка (обычно в 9–11 месяцев) созревают двигательные структуры мозга, отвечающие за ходьбу, он на время теряет способность ползать — энергетический ресурс организма ограничен и в этот период распределяется между старым и новым навыком. После того как ребёнок научился ходить, способность ползать возвращается — «всё встаёт на круги своя». Это не утрата, а временное <strong>притормаживание</strong> уже освоенных функций ради нового шага развития.</li>
+<li><strong>Неравномерность</strong> — периоды резких качественных изменений сменяются периодами постепенного количественного накопления опыта.</li>
+<li><strong>Зигзагообразность</strong> — связана с формированием принципиально новых структур мозга, которые на предыдущих этапах либо не функционировали вовсе, либо работали заметно хуже.</li>
+<li><strong>Гетерохронность</strong> — несовпадение сроков и темпов развития разных психических процессов у одного и того же ребёнка. Существуют возрастные нормативы, но всегда нужно учитывать индивидуальный темп и логику развития каждого конкретного ребёнка (по Л. С. Выготскому).</li>
+<li><strong>Переход стадий развития в уровень</strong> — уровень как более глобальное образование; стадиальность развития даёт более ёмкие, качественные изменения.</li>
+<li><strong>Тенденция к устойчивости</strong> — успешное развитие требует соблюдения целого ряда правил, требований и условий.</li>
+</ol>
+<h3 id="lecture-8-4-предмет-психологии-развития-три-составляющие-по-л-с-выготскому">4. Предмет психологии развития: три составляющие по Л. С. Выготскому</h3>
+<p>Объект психологии развития — психика человека; предмет — конкретные возрастные периоды, причины и механизмы перехода между ними, темп и направленность развития, а также индивидуальные особенности развития.</p>
+<p>По Выготскому, в предмете психологии развития выделяются три составляющие:</p>
+<table>
+<thead>
+<tr>
+<th>Составляющая</th>
+<th>Содержание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Условия развития</strong></td>
+<td>Внешний фактор — общение; внутренний фактор — здоровый головной мозг. (Значительная часть наследия Выготского — работы про задержку психического развития (ЗПР): органические, но не такие тяжёлые нарушения, как, например, умственная отсталость.)</td>
+</tr>
+<tr>
+<td><strong>Движущие силы развития</strong></td>
+<td>Источник развития — социальная среда. Побуждающая причина — <strong>процесс обучения</strong>. Ключевое понятие — <strong>зона ближайшего развития (ЗБР)</strong>: «то, что ребёнок умеет делать сегодня только с помощью взрослого, завтра сможет сам» — в противовес зоне актуального развития (то, что человек уже может сделать самостоятельно здесь и сейчас).</td>
+</tr>
+<tr>
+<td><strong>Закономерности (законы) развития</strong></td>
+<td>См. восемь особенностей выше, а также законы сенситивности, метаморфозы и компенсации ниже.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Практический вывод из идеи ЗБР:</strong> не всё в обучении должен делать сам педагог — хорошо успевающие дети (начиная примерно с 3–4 класса) могут выступать наставниками для менее успешных сверстников; дети воспринимают это как игру и справляются с ролью хорошо, но общее руководство процессом всё равно должно оставаться за педагогом.</p>
+<h3 id="lecture-8-5-три-закона-развития-по-л-с-выготскому">5. Три закона развития (по Л. С. Выготскому)</h3>
+<p><strong>Закон сенситивности (чувствительности)</strong> — для каждого психического процесса есть возрастной период, максимально благоприятный для его развития:</p>
+<ul>
+<li><strong>1–3 года</strong> — интенсивное развитие речи;</li>
+<li><strong>3–4 года</strong> — период исправления и компенсации речевых дефектов. Если в 2–2,5 года ребёнок ещё не говорит — паниковать и сразу бежать к логопеду обычно бессмысленно: соответствующие структуры мозга физиологически дозревают только ближе к 4 годам, и вмешательство не вовремя может не помочь, а навредить. Разумнее сначала проверить, какие условия для речевого развития созданы самим родителем;</li>
+<li><strong>4–5 лет</strong> — интенсивнейшее развитие памяти: с детьми этого возраста нужно учить потешки, стишки, пробовать пересказ — иначе позже могут возникнуть проблемы с памятью.</li>
+</ul>
+<p><strong>Закон метаморфозы</strong> — психика ребёнка качественно отличается от психики взрослого, и требовать от ребёнка того же, что от взрослого, — абсурд. Исторически детство как самоценный этап жизни было «открыто» относительно поздно: почти до конца XIX века ребёнка воспринимали как «мини-копию» взрослого (что видно по живописи XVI–XVIII веков, где дети одеты и позируют как взрослые). Одним из первых на самоценность детства обратил внимание П. П. Блонский.</p>
+<p><strong>Закон компенсации</strong> — недоразвитие или утрата одних психических функций может компенсироваться за счёт других, хотя это никогда не происходит быстро. Иллюстрация — многолетние наблюдения в неврологии за пациентами после инсульта: утраченные зрительные, двигательные, речевые функции со временем (иногда через много лет) частично или полностью восстанавливаются за счёт того, что их «берут на себя» другие участки мозга.</p>
+<blockquote>
+<p>Важно не путать <strong>компенсацию</strong> (восстановление утраченной функции) и <strong>адаптацию</strong> (приспособление к новому, ранее не имевшемуся опыту, без утраты — например, адаптация ребёнка к детскому саду).</p>
+</blockquote>
+<h3 id="lecture-8-6-факторы-влияющие-на-развитие">6. Факторы, влияющие на развитие</h3>
+<table>
+<thead>
+<tr>
+<th>Подход</th>
+<th>Суть</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Биологизаторский</strong></td>
+<td>Доминирует биологический фактор.</td>
+</tr>
+<tr>
+<td><strong>Социологизаторский</strong></td>
+<td>Доминирует социальный фактор/окружение. Классик подхода — Дж. Локк с идеей ребёнка как «чистой доски» (tabula rasa), на которой воспитатель «пишет» всё, что хочет. Критика: генетику и биологию невозможно игнорировать полностью.</td>
+</tr>
+<tr>
+<td><strong>Конвергенция (равнозначность)</strong> — преобладает у отечественных исследователей</td>
+<td>Биологический фактор (здоровье, генотип, типологические и возрастные особенности) + социальный фактор (семья, коллектив, образовательная организация, СМИ) — только их интеграция обеспечивает полноценное развитие.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Методологический принцип:</strong> оценивая, отстаёт ли ребёнок в развитии, нельзя ограничиваться «мгновенным срезом» — нужно соотносить его состояние с реальной ситуацией развития: были ли созданы условия для полноценного развития. Развивающая среда — это не только отношения «педагог–ребёнок», но и семья: то, что закладывает семья, хорошо видно по детским играм и по тому, что и как ребёнок пишет сам (не списывая).</p>
+<h3 id="lecture-8-7-задачи-и-функции-психологии-развития-как-науки">7. Задачи и функции психологии развития как науки</h3>
+<p><strong>Задачи:</strong><br />
+- <strong>Теоретические</strong> — изучение критериев, показателей и характеристик основных периодов жизни (детство, юность, взрослость, старость), закономерностей перехода между ними, возрастной динамики психических процессов и личности в зависимости от историко-культурных и социально-экономических условий.<br />
+- <strong>Практические (прикладные)</strong> — разработка методической базы для контроля условий и содержания психического развития, организация оптимальных форм деятельности/общения и методической помощи на разных возрастных этапах. Отдельная проблема, которую преподаватель разобрала подробно: большая часть используемого сегодня инструментария разработана 30–50 лет назад и не в полной мере отражает современные возможности человека и общества, а разработка нового требует очень больших выборок и ведётся в основном в рамках докторских диссертаций — поэтому современных валидных методик мало.</p>
+<p><strong>Функции науки:</strong><br />
+1. <strong>Описательная</strong> — детальное описание особенностей развития человека на каждом возрастном этапе (и внешних поведенческих проявлений, и внутренних переживаний).<br />
+2. <strong>Объяснительная</strong> — объяснение причин, факторов и условий тех или иных изменений в поведении и личности.<br />
+3. <strong>Прогнозирующая</strong> — прогноз изменений в поведении и переживаниях человека на будущих возрастных этапах.<br />
+4. <strong>Компенсирующая / сопровождающая</strong> (преподаватель сознательно избегает термина «корректирующая») — помощь в создании оптимальных условий и позитивной среды для развития на каждом возрастном этапе.</p>
+<h3 id="lecture-8-8-место-психологии-развития-в-системе-наук-о-человеке">8. Место психологии развития в системе наук о человеке</h3>
+<ul>
+<li><strong>Общая психология</strong> — даёт методологическую и теоретическую базу.</li>
+<li><strong>Психология личности</strong> — даёт теоретические основы развития личности.</li>
+<li><strong>Социальная психология</strong> — изучает социализацию как процесс длиной в жизнь, от первого шага ребёнка до старости.</li>
+<li><strong>Педагогическая психология</strong> — основы организации эффективного обучения.</li>
+<li><strong>Биологические науки</strong> (физиология, психофизиология, нейропсихология, физиология высшей нервной деятельности) — объясняют роль структур мозга в психических функциях.</li>
+<li><strong>Этология</strong> (наука о врождённых программах поведения) — даёт материал для сравнительного изучения развития человека и животных.</li>
+</ul>
+<p><strong>Иллюстрация связи с этологией — исследования Н. Н. Ладыгиной-Котс.</strong> В начале XX века исследовательница параллельно наблюдала за развитием собственного маленького сына и жившего в доме детёныша шимпанзе. Примерно до 2,5 лет их развитие шло вровень; затем, когда у ребёнка резко ускорилось речевое развитие, он далеко обогнал шимпанзе — потому что у обезьяны физиологически нет структур мозга, отвечающих за речь. При этом у шимпанзе удалось сформировать элементы пассивной речи (различать и приносить по просьбе знакомые предметы) — по оценке преподавателя, это, скорее, полуинстинктивный уровень, сравнимый с феноменами «инсайта» в исследованиях В. Кёлера, а не полноценный интеллект.</p>
+<p><strong>Общий методологический вывод занятия:</strong> инструментарий (тесты, методики диагностики) обязательно должен соответствовать возрастным возможностям испытуемых — бессмысленно давать трёхлетнему ребёнку абстрактный тест, рассчитанный на взрослого; нужны возрастно-адаптированные, в том числе проективные и рисуночные, методики.</p>
+<hr />
+<h3 id="lecture-8-домашнее-задание">Домашнее задание</h3>
+<p>Даже с учётом полного текста занятия <strong>явной, оцениваемой формулировки домашнего задания по теме «Психология развития» с конкретным содержанием в записи по-прежнему нет</strong>. Но полный материал прояснил, о чём именно идёт речь:</p>
+<ul>
+<li>Ближе к концу части 1 (до перерыва) преподаватель сказала: <em>«К этому термину, термину развития, мы с вами вернёмся в следующую субботу... когда мы в рамках практического занятия будем рассматривать подходы учёных к интерпретации данного феномена, феномена развития. Ещё раз повторюсь, шесть ключевых подходов. В рамках каждого подхода работают разные исследователи»</em>. Это подтверждает и объясняет упомянутую в части 2 фразу про материалы в <strong>Moodle</strong> («феномен развития» и «шесть глобальных подходов»): речь идёт о подготовке к практическому занятию в одну из следующих суббот — нужно самостоятельно изучить в Moodle шесть ключевых научных подходов к пониманию (интерпретации) феномена «развитие» и связанных с каждым из них исследователей, чтобы обсудить их на занятии.</li>
+<li>Тем не менее <strong>конкретный перечень этих шести подходов и их содержание в аудиозаписи не названы</strong> — преподаватель лишь анонсировала тему и количество подходов, отправив группу к материалам Moodle. Без доступа к самим материалам Moodle нельзя честно и точно ответить на это задание (в психологии развития существует несколько устоявшихся общих схем классификации подходов к пониманию развития, но подставлять любую из них как «тот самый» список означало бы гадать, а не отвечать по существу материалов занятия — поэтому готового ответа здесь намеренно нет). Если формулировка задания и материалы по шести подходам найдутся в Moodle — их стоит прислать отдельно, тогда ответ можно будет дописать в этот файл, не трогая архив полной расшифровки.</li>
+<li>Отдельное напоминание не забывать про темы <strong>творческих заданий по дисциплине «Основы психологии»</strong> — судя по формулировке, это задание относится к другому предмету, не к психологии развития, и его содержание в записи не раскрывается.</li>
+</ul>
+</section>
+  </main>
+</div>
+<script>
+(function(){
+  var TOPICS = [
+    {id:"lecture-1", num:"01", title:"03.09.2026 — Минаева Е.В.: Проектирование и практика проведения тренинга в организации 📝ДЗ", status:"ok"},
+    {id:"lecture-2", num:"02", title:"07.09.2026 — Алёхин И.А.: Профессиональная этика и служебный этикет — предмет этики", status:"ok"},
+    {id:"lecture-3", num:"03", title:"08.09.2026 — Суворова: Методология психологического исследования", status:"ok"},
+    {id:"lecture-4", num:"04", title:"09.09.2026 — Гапонова С.А.: Психология профессиональной деятельности и методы исследования", status:"ok"},
+    {id:"lecture-5", num:"05", title:"10.09.2026 — Минаева Е.В.: Проектирование и практика проведения тренинга в организации (продолжение)", status:"ok"},
+    {id:"lecture-6", num:"06", title:"11.09.2026 — Серебрякова Т.А.: Основы психологии: история становления психологии как науки 📝ДЗ", status:"ok"},
+    {id:"lecture-7", num:"07", title:"12.09.2026 — Ловков С.Г.: Коллективное поведение", status:"ok"},
+    {id:"lecture-8", num:"08", title:"12.09.2026 — Серебрякова Т.А.: Психология развития: предмет, история, закономерности развития", status:"ok"}
+  ];
+
+  var tocTopics = document.getElementById("toc-topics");
+
+  TOPICS.forEach(function(t){
+    var btn = document.createElement("button");
+    btn.className = "toc-item";
+    btn.setAttribute("data-target", t.id);
+    btn.innerHTML = '<span class="toc-num">'+t.num+'</span><span class="toc-text">'+t.title+'</span>';
+    tocTopics.appendChild(btn);
+  });
+
+  var allTargets = document.querySelectorAll("[data-target]");
+  var sections = document.querySelectorAll(".topic-content, .overview");
+
+  function show(id){
+    sections.forEach(function(s){ s.classList.toggle("active", s.id === id); });
+    allTargets.forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-target") === id); });
+    var main = document.querySelector("main");
+    main.scrollTo(0,0);
+    window.scrollTo(0,0);
+    document.getElementById("sidebar").classList.remove("open");
+    try{
+      if(history && history.replaceState){ history.replaceState(null, "", "#"+id); }
+    }catch(e){
+      /* file:// pages have an opaque origin in Safari/Chrome — replaceState
+         throws SecurityError there. Navigation must keep working regardless. */
+    }
+  }
+
+  allTargets.forEach(function(b){
+    b.addEventListener("click", function(){ show(b.getAttribute("data-target")); });
+  });
+
+  document.querySelectorAll(".mini-toc a").forEach(function(a){
+    a.addEventListener("click", function(ev){
+      ev.preventDefault();
+      var targetId = a.getAttribute("href").slice(1);
+      var el = document.getElementById(targetId);
+      if(!el) return;
+      var parentSection = el.closest(".topic-content");
+      if(parentSection && !parentSection.classList.contains("active")){
+        show(parentSection.id);
+      }
+      requestAnimationFrame(function(){
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+      });
+    });
+  });
+
+  var menuToggle = document.getElementById("menu-toggle");
+  if(menuToggle){
+    menuToggle.addEventListener("click", function(){
+      document.getElementById("sidebar").classList.toggle("open");
+    });
+  }
+
+  var initial = (location.hash || "").replace("#","");
+  if(initial && document.getElementById(initial)){
+    var el = document.getElementById(initial);
+    if(el.classList.contains("topic-content") || el.id === "overview"){
+      show(initial);
+    } else {
+      var parentSection = el.closest(".topic-content");
+      if(parentSection){ show(parentSection.id); requestAnimationFrame(function(){ el.scrollIntoView(); }); }
+    }
+  }
+
+  var input = document.getElementById("search-input");
+  var resultsBox = document.getElementById("search-results");
+  var emptyBox = document.getElementById("search-empty");
+  var titleById = {};
+  TOPICS.forEach(function(t){ titleById[t.id] = t.title; });
+  titleById["overview"] = "О базе данных";
+
+  function escapeHtml(s){
+    return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  input.addEventListener("input", function(){
+    var q = input.value.trim();
+    if(q.length < 3){
+      resultsBox.classList.remove("show");
+      emptyBox.style.display = "none";
+      resultsBox.innerHTML = "";
+      return;
+    }
+    var qLower = q.toLowerCase();
+    var matches = [];
+    sections.forEach(function(sec){
+      if(sec.id === "overview") return;
+      var text = sec.textContent.replace(/\s+/g," ").trim();
+      var lower = text.toLowerCase();
+      var idx = lower.indexOf(qLower);
+      if(idx > -1){
+        var start = Math.max(0, idx - 40);
+        var end = Math.min(text.length, idx + qLower.length + 60);
+        var snippet = (start>0?"…":"") + text.slice(start,end) + (end<text.length?"…":"");
+        var re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'), "ig");
+        snippet = escapeHtml(snippet).replace(re, function(m){ return "<mark>"+m+"</mark>"; });
+        matches.push({id: sec.id, title: titleById[sec.id] || sec.id, snippet: snippet});
+      }
+    });
+    resultsBox.innerHTML = "";
+    if(matches.length === 0){
+      resultsBox.classList.remove("show");
+      emptyBox.style.display = "block";
+    } else {
+      emptyBox.style.display = "none";
+      resultsBox.classList.add("show");
+      matches.slice(0,30).forEach(function(m){
+        var b = document.createElement("button");
+        b.innerHTML = '<div class="sr-topic">'+m.title+'</div><div class="sr-snip">'+m.snippet+'</div>';
+        b.addEventListener("click", function(){ show(m.id); });
+        resultsBox.appendChild(b);
+      });
+    }
+  });
+})();
+
+</script>
+</body>
+</html>
